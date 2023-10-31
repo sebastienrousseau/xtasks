@@ -8,6 +8,6 @@
 /target/
 build
 Icon?
-shokunin.log
+xtasks.log
 src/.DS_Store
 tarpaulin-report.html

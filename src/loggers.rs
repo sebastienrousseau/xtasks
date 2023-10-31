@@ -13,7 +13,7 @@ use std::{
 ///
 /// This enum allows the developer to specify the format in which log messages should be displayed.
 ///
-#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, PartialOrd)]
 pub enum LogFormat {
     /// The log format is set to the Common Log Format (CLF)
     CLF,
@@ -55,7 +55,7 @@ impl fmt::Display for LogFormat {
 /// * `VERBOSE` - The log level is set to verbose.
 /// * `WARNING` - The log level is set to warning.
 ///
-#[derive(Debug, PartialEq, Eq, Hash, Clone,PartialOrd)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, PartialOrd)]
 pub enum LogLevel {
     /// The log level is set to all.
     ALL,
@@ -122,7 +122,7 @@ impl Log {
         let mut file = OpenOptions::new()
     .write(true)
     .truncate(true)
-    .open("shokunin.log")?;
+    .open("xtasks.log")?;
         match self.format {
             LogFormat::CLF => {
                 writeln!(

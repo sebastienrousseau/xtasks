@@ -30,8 +30,8 @@ macro_rules! assert {
     };
 }
 
-#[macro_export]
 /// # `macro_log_info` Macro
+#[macro_export]
 macro_rules! macro_log_info {
     ($level:expr, $component:expr, $description:expr, $format:expr) => {
         {
@@ -49,6 +49,7 @@ macro_rules! macro_log_info {
 
             let log = Log::new(&session_id, &iso, $level, $component, $description, $format);
             let _ = log.log();
+            log // Return the Log instance
         }
     };
 }
