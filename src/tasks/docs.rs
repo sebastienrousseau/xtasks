@@ -32,7 +32,7 @@ pub fn docs() -> AnyResult<()> {
 /// # Errors
 ///
 /// Returns an `anyhow::Error` if the `cargo install cargo-watch` command fails to execute.
-fn ensure_cargo_watch_installed() -> AnyResult<()> {
+pub fn ensure_cargo_watch_installed() -> AnyResult<()> {
     let output = Command::new("cargo")
         .args(["install", "cargo-watch"])
         .output()
