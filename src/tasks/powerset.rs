@@ -1,8 +1,8 @@
 // Copyright © 2023 xtasks. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-use derive_builder::Builder;
 use anyhow::{Context, Result as AnyResult};
+use derive_builder::Builder;
 use serde::{Deserialize, Serialize};
 
 /// Represents the configuration for generating a powerset of features for cargo build runs.
@@ -10,7 +10,15 @@ use serde::{Deserialize, Serialize};
 /// A powerset in this context refers to all possible combinations of features that can be enabled
 /// or disabled for a cargo build.
 #[derive(
-    Builder, Debug, Default, PartialEq, Eq, Hash, Clone, Serialize, Deserialize,
+    Builder,
+    Debug,
+    Default,
+    PartialEq,
+    Eq,
+    Hash,
+    Clone,
+    Serialize,
+    Deserialize,
 )]
 #[builder(setter(into))]
 pub struct Powerset {
@@ -46,13 +54,17 @@ impl PowersetBuilder {
     ///
     /// This function will return an error if any of the `cargo` commands fail to execute.
     pub fn run(&self) -> AnyResult<()> {
-        let t = self.build().context("Failed to build Powerset configuration")?;
+        let t = self
+            .build()
+            .context("Failed to build Powerset configuration")?;
         let depth = t.depth.to_string();
         let mut common_args = vec![
             "--workspace",
-            "--exclude", "xtask",
+            "--exclude",
+            "xtask",
             "--feature-powerset",
-            "--depth", &depth,
+            "--depth",
+            &depth,
         ];
         if t.exclude_no_default_features {
             common_args.push("--exclude-no-default-features");
@@ -83,6 +95,24 @@ impl PowersetBuilder {
             .context("Failed to execute 'cargo hack test --doc'")?;
 
         Ok(())
+    }
+
+    /// Creates a new `PowersetBuilder` instance with a specified depth.
+    ///
+    /// # Arguments
+    ///
+    /// * `depth` - The depth of the powerset.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use xtasks::tasks::powerset::PowersetBuilder;
+    /// let builder = PowersetBuilder::new(3);
+    /// ```
+    pub fn new(depth: i32) -> Self {
+        let mut builder = PowersetBuilder::default();
+        builder.depth(depth);
+        builder
     }
 }
 

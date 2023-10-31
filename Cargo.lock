@@ -1231,6 +1231,7 @@ dependencies = [
  "fs_extra",
  "glob",
  "serde",
+ "serde_json",
  "vrd",
 ]
 
