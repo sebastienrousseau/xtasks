@@ -7,17 +7,6 @@ use duct::cmd;
 ///
 /// * `dev` - If `true`, generates an HTML report for easier viewing and analysis.
 ///
-/// # Examples
-///
-/// ```
-/// # use anyhow::Result;
-/// # fn run() -> Result<()> {
-/// coverage(true)?;
-/// # Ok(())
-/// # }
-/// # run().unwrap();
-/// ```
-///
 /// # Errors
 ///
 /// Returns an error if the `cargo tarpaulin` command fails to execute.

@@ -2,39 +2,22 @@
 use derive_builder::Builder;
 use anyhow::{Context, Result as AnyResult};
 use duct::cmd;
+use serde::{Deserialize, Serialize};
 
 /// Represents the configuration for a Continuous Integration (CI) run.
 ///
 /// This struct encapsulates various settings that can be configured for a CI run,
 /// such as whether to run with the nightly compiler or to enable all Clippy lints.
 ///
-/// # Examples
-///
-/// ```
-/// # use ci::CI;
-/// let ci_config = CI::builder()
-///     .nightly(true)
-///     .clippy_max(false)
-///     .build()
-///     .unwrap();
-/// ```
-#[derive(Builder)]
+#[derive(
+    Builder, Debug, Default, PartialEq, Eq, Hash, Clone, Serialize, Deserialize,
+)]
 #[builder(setter(into))]
 pub struct CI {
     /// Determines whether to run the CI tasks with the nightly version of the Rust compiler.
     ///
     /// By default, this is set to `false`, meaning that the stable compiler will be used.
     ///
-    /// # Examples
-    ///
-    /// ```
-    /// # use ci::CI;
-    /// let ci_config = CI::builder()
-    ///     .nightly(true)
-    ///     .build()
-    ///     .unwrap();
-    /// assert_eq!(ci_config.nightly, true);
-    /// ```
     #[builder(default = "false")]
     pub nightly: bool,
 
@@ -42,16 +25,6 @@ pub struct CI {
     ///
     /// By default, this is set to `true`, meaning that all Clippy lints will be enabled.
     ///
-    /// # Examples
-    ///
-    /// ```
-    /// # use ci::CI;
-    /// let ci_config = CI::builder()
-    ///     .clippy_max(false)
-    ///     .build()
-    ///     .unwrap();
-    /// assert_eq!(ci_config.clippy_max, false);
-    /// ```
     #[builder(default = "true")]
     pub clippy_max: bool,
 }

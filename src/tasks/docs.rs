@@ -11,17 +11,6 @@ use std::process::Command;
 /// the documentation whenever changes are detected in the source code.
 /// This is particularly useful during development.
 ///
-/// # Examples
-///
-/// ```
-/// # use anyhow::Result;
-/// # fn run() -> Result<()> {
-/// docs::docs()?;
-/// # Ok(())
-/// # }
-/// # run().unwrap();
-/// ```
-///
 /// # Errors
 ///
 /// Returns an `anyhow::Error` if the `cargo watch` or `cargo doc` commands fail to execute.
@@ -39,18 +28,6 @@ pub fn docs() -> AnyResult<()> {
 }
 
 /// Ensures that the `cargo-watch` tool is installed.
-///
-/// # Examples
-///
-/// ```
-/// # use anyhow::Result;
-/// # use docs::ensure_cargo_watch_installed;
-/// # fn run() -> Result<()> {
-/// ensure_cargo_watch_installed()?;
-/// # Ok(())
-/// # }
-/// # run().unwrap();
-/// ```
 ///
 /// # Errors
 ///

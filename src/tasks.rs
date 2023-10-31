@@ -70,11 +70,21 @@ use crate::tasks::{
     docs::docs,
     powerset::powerset,
 };
-mod bloat;
-mod ci;
-mod coverage;
-mod docs;
-mod powerset;
+
+/// Analyses the dependencies of the current project to find which ones contribute most to the build size.
+pub mod bloat;
+
+/// Implements a variety of CI tasks to validate code quality, run tests, and ensure the stability of the codebase.
+pub mod ci;
+
+/// Automate the creation of project documentation, ensuring consistency and completeness across all codebase components.
+pub mod coverage;
+
+/// Streamline the development workflow with tasks designed to automate repetitive tasks and improve efficiency.
+pub mod docs;
+
+/// Easily extend and customize tasks to suit the unique requirements of your project.
+pub mod powerset;
 
 ///
 /// Watch changes and after every change: `cargo check`, followed by `cargo test`
@@ -150,15 +160,15 @@ pub fn main() -> AnyResult<()> {
             println!("root: {root:?}");
             Ok(())
         }
-        Some(("ci", _)) => crate::tasks::ci(),
+        Some(("ci", _)) => ci(),
         Some(("coverage", _)) => coverage(matches.contains_id("dev")),
         Some(("docs", _)) => docs(),
-        Some(("powerset", _)) => crate::tasks::powerset(),
-        Some(("bloat-deps", sm)) => crate::tasks::bloat_deps(
+        Some(("powerset", _)) => powerset(),
+        Some(("bloat-deps", sm)) => bloat_deps(
             sm.get_one::<String>("package")
                 .context("please provide a package with -p")?,
         ),
-        Some(("bloat-time", sm)) => crate::tasks::bloat_time(
+        Some(("bloat-time", sm)) => bloat_time(
             sm.get_one::<String>("package")
                 .context("please provide a package with -p")?,
         ),

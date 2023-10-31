@@ -3,12 +3,15 @@
 
 use derive_builder::Builder;
 use anyhow::{Context, Result as AnyResult};
+use serde::{Deserialize, Serialize};
 
 /// Represents the configuration for generating a powerset of features for cargo build runs.
 ///
 /// A powerset in this context refers to all possible combinations of features that can be enabled
 /// or disabled for a cargo build.
-#[derive(Builder)]
+#[derive(
+    Builder, Debug, Default, PartialEq, Eq, Hash, Clone, Serialize, Deserialize,
+)]
 #[builder(setter(into))]
 pub struct Powerset {
     /// Specifies the depth of the powerset.

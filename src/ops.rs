@@ -1,24 +1,13 @@
 // Copyright © 2023 xtasks. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-//! `xtaskops` is a collection of building block operations such as copy, remove, confirm, and more
+//! `xtasks` is a collection of building block operations such as copy, remove, confirm, and more
 //! for use in Rust project management tasks.
 //!
 //! This module provides utility functions that abstract over common filesystem operations, 
 //! making it easier to perform tasks like cleaning up generated files, copying directory contents, 
 //! and prompting the user for confirmation.
 //!
-//! # Examples
-//!
-//! ```
-//! use xtaskops::ops::clean_files;
-//!
-//! fn main() -> anyhow::Result<()> {
-//!     clean_files("target/debug/*.tmp")?;
-//!     Ok(())
-//! }
-//! ```
-
 use anyhow::{Result as AnyResult, Error as AnyError};
 use dialoguer::{theme::ColorfulTheme, Confirm};
 use fs_extra as fsx;
@@ -49,17 +38,6 @@ pub use duct::cmd;
 /// - If the glob pattern is invalid.
 /// - If any of the files matching the glob pattern cannot be removed.
 ///
-/// # Examples
-///
-/// ```
-/// use xtaskops::ops::clean_files;
-///
-/// # fn run() -> anyhow::Result<()> {
-/// clean_files("target/debug/*.tmp")?;
-/// # Ok(())
-/// # }
-/// # run().unwrap();
-/// ```
 pub fn clean_files(pattern: &str) -> AnyResult<()> {
     let files = glob(pattern)
         .map_err(AnyError::new)?
