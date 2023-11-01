@@ -1232,6 +1232,7 @@ dependencies = [
  "glob",
  "serde",
  "serde_json",
+ "tempfile",
  "vrd",
 ]
 

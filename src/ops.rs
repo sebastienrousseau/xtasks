@@ -49,23 +49,36 @@ pub fn clean_files(pattern: &str) -> AnyResult<()> {
 
 /// Removes a single file.
 ///
+/// This function attempts to remove a file located at the specified path.
+/// If the file does not exist, it returns an error.
+///
 /// # Parameters
 ///
-/// - `path`: The path of the file to remove.
+/// - `path`: A generic parameter that implements `AsRef<Path>`, representing the path of the file to remove.
 ///
 /// # Returns
 ///
 /// A `Result` that is `Ok` if the file was successfully removed, or an `Err` wrapping an `anyhow::Error`
-/// if an error occurred.
+/// if an error occurred during the removal process.
 ///
 /// # Errors
 ///
-/// This function will return an error if the file removal fails.
+/// This function will return an error in the following cases:
+/// - The file does not exist at the specified path.
+/// - The removal operation fails for any reason (e.g., insufficient permissions, file is in use, etc.).
+///
 pub fn remove_file<P>(path: P) -> AnyResult<()>
 where
     P: AsRef<Path>,
 {
-    fsx::file::remove(&path).map_err(AnyError::new)
+    let path_ref = path.as_ref();
+    if !path_ref.exists() {
+        return Err(AnyError::new(std::io::Error::new(
+            std::io::ErrorKind::NotFound,
+            "File not found",
+        )));
+    }
+    fsx::file::remove(path_ref).map_err(AnyError::new)
 }
 
 /// Removes a directory along with its contents.
@@ -86,7 +99,14 @@ pub fn remove_dir<P>(path: P) -> AnyResult<()>
 where
     P: AsRef<Path>,
 {
-    fsx::dir::remove(&path).map_err(AnyError::new)
+    let path_ref = path.as_ref();
+    if !path_ref.is_dir() {
+        return Err(AnyError::new(std::io::Error::new(
+            std::io::ErrorKind::NotFound,
+            "Directory not found",
+        )));
+    }
+    fsx::dir::remove(path_ref).map_err(AnyError::new)
 }
 
 /// Checks if a given path exists.

@@ -66,6 +66,7 @@ vrd = "0.0.4"
 [dev-dependencies]
 assert_cmd = "2.0.12"
 criterion = "0.5.1"
+tempfile = "3.8.1"
 
 [profile.dev]
 codegen-units = 256
