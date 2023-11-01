@@ -1,7 +1,9 @@
-use std::ffi::OsStr;
-use std::os::unix::process::ExitStatusExt;
-use std::process::{Command, Output, ExitStatus};
-use std::io::Result;
+use std::{
+    ffi::OsStr,
+    io::Result,
+    os::unix::process::ExitStatusExt,
+    process::{Command, ExitStatus, Output},
+};
 
 /// A trait defining a set of methods for running system commands.
 ///
@@ -23,7 +25,9 @@ trait CommandRunner {
     /// # Returns
     ///
     /// A new instance of the implementing type.
-    fn new<S: AsRef<OsStr>>(program: S) -> Self where Self: Sized;
+    fn new<S: AsRef<OsStr>>(program: S) -> Self
+    where
+        Self: Sized;
 
     /// Adds arguments to the command to be run.
     ///
@@ -94,7 +98,7 @@ impl CommandRunner for RealCommand {
     ///
     /// A new `RealCommand` instance.
     fn new<S: AsRef<OsStr>>(program: S) -> Self {
-        RealCommand(Command::new(program))
+        Self(Command::new(program))
     }
 
     /// Adds arguments to the command to be run.
@@ -163,7 +167,7 @@ impl MockCommand {
     ///
     /// A new `MockCommand` instance.
     fn new() -> Self {
-        MockCommand {
+        Self {
             status: ExitStatus::from_raw(0),
             stdout: Vec::new(),
             stderr: Vec::new(),
@@ -181,7 +185,7 @@ impl MockCommand {
     /// # Returns
     ///
     /// The `MockCommand` instance with the updated exit status.
-    fn status(mut self, status: ExitStatus) -> Self {
+    const fn status(mut self, status: ExitStatus) -> Self {
         self.status = status;
         self
     }
@@ -208,7 +212,7 @@ impl CommandRunner for MockCommand {
     ///
     /// A new `MockCommand` instance.
     fn new<S: AsRef<OsStr>>(_cmd: S) -> Self {
-        MockCommand::new()
+        Self::new()
     }
 
     /// Adds arguments to the mock command.
@@ -221,7 +225,10 @@ impl CommandRunner for MockCommand {
         I: IntoIterator<Item = S>,
         S: AsRef<OsStr>,
     {
-        self.args.extend(args.into_iter().map(|s| s.as_ref().to_string_lossy().to_string()));
+        self.args.extend(
+            args.into_iter()
+                .map(|s| s.as_ref().to_string_lossy().to_string()),
+        );
         self
     }
 
@@ -235,7 +242,10 @@ impl CommandRunner for MockCommand {
         K: AsRef<OsStr>,
         V: AsRef<OsStr>,
     {
-        self.env.push((key.as_ref().to_string_lossy().to_string(), value.as_ref().to_string_lossy().to_string()));
+        self.env.push((
+            key.as_ref().to_string_lossy().to_string(),
+            value.as_ref().to_string_lossy().to_string(),
+        ));
         self
     }
 
@@ -262,11 +272,11 @@ mod tests {
     #[test]
     fn test_ci_functionality() {
         let ci = CI::default();
-        assert_eq!(ci.nightly, false);
-        assert_eq!(ci.clippy_max, false);
+        assert!(!ci.nightly);
+        assert!(!ci.clippy_max);
     }
 
-    /// Tests the functionality of the MockCommand struct.
+    /// Tests the functionality of the `MockCommand` struct.
     #[test]
     fn test_mock_command() {
         let output = b"Hello, world!\n";

@@ -1,6 +1,5 @@
-
-use derive_builder::Builder;
 use anyhow::{Context, Result as AnyResult};
+use derive_builder::Builder;
 use duct::cmd;
 use serde::{Deserialize, Serialize};
 
@@ -10,7 +9,15 @@ use serde::{Deserialize, Serialize};
 /// such as whether to run with the nightly compiler or to enable all Clippy lints.
 ///
 #[derive(
-    Builder, Debug, Default, PartialEq, Eq, Hash, Clone, Serialize, Deserialize,
+    Builder,
+    Debug,
+    Default,
+    PartialEq,
+    Eq,
+    Hash,
+    Clone,
+    Serialize,
+    Deserialize,
 )]
 #[builder(setter(into))]
 pub struct CI {
@@ -45,9 +52,14 @@ impl CIBuilder {
         } = self.build().context("Failed to build CI configuration")?;
 
         if nightly {
-            cmd!("rustup", "run", "nightly", "cargo", "fmt", "--", "--check")
-                .run()
-                .context("Failed to execute 'cargo fmt' with nightly compiler")?;
+            cmd!(
+                "rustup", "run", "nightly", "cargo", "fmt", "--",
+                "--check"
+            )
+            .run()
+            .context(
+                "Failed to execute 'cargo fmt' with nightly compiler",
+            )?;
         } else {
             cmd!("cargo", "fmt", "--", "--check")
                 .run()
@@ -55,9 +67,21 @@ impl CIBuilder {
         }
 
         if clippy_max {
-            cmd!("cargo", "clippy", "--all-targets", "--all-features", "--", "-D", "warnings", "-W", "clippy::pedantic", "-W", "clippy::nursery", "-W", "clippy::2018-idioms")
-                .run()
-                .context("Failed to execute 'cargo clippy' with maximum linting")?;
+            cmd!(
+                "cargo",
+                "clippy",
+                "--all-targets",
+                "--all-features",
+                "--",
+                "-D",
+                "warnings",
+                "-W",
+                "clippy::pedantic",
+                "-W",
+                "clippy::nursery"
+            )
+            .run()
+            .context("Failed to execute 'cargo clippy'")?;
         } else {
             cmd!("cargo", "clippy", "--", "-D", "warnings")
                 .run()
@@ -87,4 +111,3 @@ impl CIBuilder {
 pub fn ci() -> AnyResult<()> {
     CIBuilder::default().run()
 }
-

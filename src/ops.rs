@@ -4,11 +4,10 @@
 //! `xtasks` is a collection of building block operations such as copy, remove, confirm, and more
 //! for use in Rust project management tasks.
 //!
-//! This module provides utility functions that abstract over common filesystem operations, 
-//! making it easier to perform tasks like cleaning up generated files, copying directory contents, 
-//! and prompting the user for confirmation.
+//! This module provides utility functions that abstract over common filesystem operations,
+//! making it easier to perform tasks like cleaning up generated files, copying directory contents,
 //!
-use anyhow::{Result as AnyResult, Error as AnyError};
+use anyhow::{Error as AnyError, Result as AnyResult};
 use dialoguer::{theme::ColorfulTheme, Confirm};
 use fs_extra as fsx;
 use fsx::dir::CopyOptions;
@@ -141,7 +140,11 @@ where
 /// # Errors
 ///
 /// This function will return an error if any file operation fails.
-pub fn copy_contents<P, Q>(from: P, to: Q, overwrite: bool) -> AnyResult<u64>
+pub fn copy_contents<P, Q>(
+    from: P,
+    to: Q,
+    overwrite: bool,
+) -> AnyResult<u64>
 where
     P: AsRef<Path>,
     Q: AsRef<Path>,

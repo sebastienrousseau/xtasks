@@ -33,23 +33,28 @@ macro_rules! assert {
 /// # `macro_log_info` Macro
 #[macro_export]
 macro_rules! macro_log_info {
-    ($level:expr, $component:expr, $description:expr, $format:expr) => {
-        {
-            use $crate::loggers::{Log, LogLevel, LogFormat};
-            use dtt::DateTime;
-            use vrd::Random;
+    ($level:expr, $component:expr, $description:expr, $format:expr) => {{
+        use dtt::DateTime;
+        use vrd::Random;
+        use $crate::loggers::{Log, LogFormat, LogLevel};
 
-            // Get the current date and time in ISO 8601 format.
-            let date = DateTime::new();
-            let iso = date.iso_8601;
+        // Get the current date and time in ISO 8601 format.
+        let date = DateTime::new();
+        let iso = date.iso_8601;
 
-            // Create a new random number generator
-            let mut rng = Random::default();
-            let session_id = rng.rand().to_string();
+        // Create a new random number generator
+        let mut rng = Random::default();
+        let session_id = rng.rand().to_string();
 
-            let log = Log::new(&session_id, &iso, $level, $component, $description, $format);
-            let _ = log.log();
-            log // Return the Log instance
-        }
-    };
+        let log = Log::new(
+            &session_id,
+            &iso,
+            $level,
+            $component,
+            $description,
+            $format,
+        );
+        let _ = log.log();
+        log // Return the Log instance
+    }};
 }

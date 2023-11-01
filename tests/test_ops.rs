@@ -1,10 +1,10 @@
 #[cfg(test)]
 mod tests {
 
-    use xtasks::ops::*;
-    use tempfile::tempdir;
     use std::fs;
     use std::path::Path;
+    use tempfile::tempdir;
+    use xtasks::ops::*;
 
     #[test]
     fn test_clean_files() {
@@ -12,7 +12,10 @@ mod tests {
         fs::File::create(tmp_dir.path().join("tmp1.txt")).unwrap();
         fs::File::create(tmp_dir.path().join("tmp2.txt")).unwrap();
 
-        assert!(clean_files(tmp_dir.path().join("*.txt").to_str().unwrap()).is_ok());
+        assert!(clean_files(
+            tmp_dir.path().join("*.txt").to_str().unwrap()
+        )
+        .is_ok());
         assert!(!exists(tmp_dir.path().join("tmp1.txt")));
         assert!(!exists(tmp_dir.path().join("tmp2.txt")));
     }
@@ -52,7 +55,9 @@ mod tests {
 
     #[test]
     fn test_remove_file_non_existent() {
-        assert!(remove_file(Path::new("non_existent_file.txt")).is_err());
+        assert!(
+            remove_file(Path::new("non_existent_file.txt")).is_err()
+        );
     }
 
     #[test]
@@ -63,7 +68,9 @@ mod tests {
 
     #[test]
     fn test_remove_dir_non_existent() {
-        assert!(remove_dir(Path::new("non_existent_directory")).is_err());
+        assert!(
+            remove_dir(Path::new("non_existent_directory")).is_err()
+        );
     }
 
     #[test]
@@ -92,7 +99,10 @@ mod tests {
         fs::File::create(sub_dir.join("tmp1.txt")).unwrap();
         fs::File::create(sub_dir.join("tmp2.txt")).unwrap();
 
-        assert!(clean_files(tmp_dir.path().join("*").to_str().unwrap()).is_err());
+        assert!(clean_files(
+            tmp_dir.path().join("*").to_str().unwrap()
+        )
+        .is_err());
         assert!(exists(&sub_dir));
         assert!(exists(sub_dir.join("tmp1.txt")));
         assert!(exists(sub_dir.join("tmp2.txt")));
@@ -104,9 +114,11 @@ mod tests {
         fs::File::create(tmp_dir.path().join("tmp1.txt")).unwrap();
         fs::File::create(tmp_dir.path().join("tmp2.txt")).unwrap();
 
-        assert!(clean_files(tmp_dir.path().join("*.md").to_str().unwrap()).is_ok());
+        assert!(clean_files(
+            tmp_dir.path().join("*.md").to_str().unwrap()
+        )
+        .is_ok());
         assert!(exists(tmp_dir.path().join("tmp1.txt")));
         assert!(exists(tmp_dir.path().join("tmp2.txt")));
     }
-
 }

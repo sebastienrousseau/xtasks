@@ -1,8 +1,14 @@
 #[cfg(test)]
 mod tests {
 
-    fn test_macro_log(level: LogLevel, component: &str, description: &str, format: LogFormat) {
-        let log = macro_log_info!(level, component, description, format);
+    fn test_macro_log(
+        level: LogLevel,
+        component: &str,
+        description: &str,
+        format: LogFormat,
+    ) {
+        let log =
+            macro_log_info!(level, component, description, format);
         assert_eq!(log.level, level);
         assert_eq!(log.component, component);
         assert_eq!(log.description, description);
@@ -11,30 +17,83 @@ mod tests {
 
     #[test]
     fn test_macros() {
-        test_macro_log(LogLevel::ALL, "component", "description", LogFormat::CLF);
-        test_macro_log(LogLevel::DEBUG, "component", "description", LogFormat::CLF);
-        test_macro_log(LogLevel::DISABLED, "component", "description", LogFormat::CLF);
-        test_macro_log(LogLevel::ERROR, "component", "description", LogFormat::CLF);
-        test_macro_log(LogLevel::FATAL, "component", "description", LogFormat::CLF);
-        test_macro_log(LogLevel::INFO, "component", "description", LogFormat::CLF);
-        test_macro_log(LogLevel::NONE, "component", "description", LogFormat::CLF);
-        test_macro_log(LogLevel::TRACE, "component", "description", LogFormat::CLF);
-        test_macro_log(LogLevel::VERBOSE, "component", "description", LogFormat::CLF);
-        test_macro_log(LogLevel::WARNING, "component", "description", LogFormat::CLF);
+        test_macro_log(
+            LogLevel::ALL,
+            "component",
+            "description",
+            LogFormat::CLF,
+        );
+        test_macro_log(
+            LogLevel::DEBUG,
+            "component",
+            "description",
+            LogFormat::CLF,
+        );
+        test_macro_log(
+            LogLevel::DISABLED,
+            "component",
+            "description",
+            LogFormat::CLF,
+        );
+        test_macro_log(
+            LogLevel::ERROR,
+            "component",
+            "description",
+            LogFormat::CLF,
+        );
+        test_macro_log(
+            LogLevel::FATAL,
+            "component",
+            "description",
+            LogFormat::CLF,
+        );
+        test_macro_log(
+            LogLevel::INFO,
+            "component",
+            "description",
+            LogFormat::CLF,
+        );
+        test_macro_log(
+            LogLevel::NONE,
+            "component",
+            "description",
+            LogFormat::CLF,
+        );
+        test_macro_log(
+            LogLevel::TRACE,
+            "component",
+            "description",
+            LogFormat::CLF,
+        );
+        test_macro_log(
+            LogLevel::VERBOSE,
+            "component",
+            "description",
+            LogFormat::CLF,
+        );
+        test_macro_log(
+            LogLevel::WARNING,
+            "component",
+            "description",
+            LogFormat::CLF,
+        );
     }
 
-    use xtasks::{loggers::{LogLevel, LogFormat, Log}, macro_log_info};
+    use xtasks::{
+        loggers::{Log, LogFormat, LogLevel},
+        macro_log_info,
+    };
 
     #[test]
     fn test_log_level_display() {
         let level = LogLevel::INFO;
-        assert_eq!(format!("{}", level), "INFO");
+        assert_eq!(format!("{level}"), "INFO");
     }
 
     #[test]
     fn test_log_format_display() {
         let format = LogFormat::JSON;
-        assert_eq!(format!("{}", format), "JSON\n");
+        assert_eq!(format!("{format}"), "JSON\n");
     }
 
     #[test]

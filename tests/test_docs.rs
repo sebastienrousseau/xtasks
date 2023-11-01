@@ -1,19 +1,26 @@
-
 #[cfg(test)]
 mod tests {
-    use std::os::unix::process::ExitStatusExt;
-    use std::process::{Command, Output, ExitStatus};
-    use std::io::Result;
     use std::ffi::OsStr;
+    use std::io::Result;
+    use std::os::unix::process::ExitStatusExt;
+    use std::process::{Command, ExitStatus, Output};
 
     trait CommandRunner {
-        fn new(cmd: &str) -> Self where Self: Sized;
+        fn new(cmd: &str) -> Self
+        where
+            Self: Sized;
         fn args<I, S>(self, args: I) -> Self
-            where
-                I: IntoIterator<Item = S>,
-                S: AsRef<OsStr>,
-                Self: Sized;
-        fn env<K: AsRef<OsStr>, V: AsRef<OsStr>>(self, key: K, value: V) -> Self where Self: Sized;
+        where
+            I: IntoIterator<Item = S>,
+            S: AsRef<OsStr>,
+            Self: Sized;
+        fn env<K: AsRef<OsStr>, V: AsRef<OsStr>>(
+            self,
+            key: K,
+            value: V,
+        ) -> Self
+        where
+            Self: Sized;
         fn spawn(&mut self) -> Result<Output>;
     }
 
@@ -21,19 +28,23 @@ mod tests {
 
     impl CommandRunner for RealCommand {
         fn new(cmd: &str) -> Self {
-            RealCommand(Command::new(cmd))
+            Self(Command::new(cmd))
         }
 
         fn args<I, S>(mut self, args: I) -> Self
-            where
-                I: IntoIterator<Item = S>,
-                S: AsRef<OsStr>,
-            {
-                self.0.args(args);
-                self
-            }
+        where
+            I: IntoIterator<Item = S>,
+            S: AsRef<OsStr>,
+        {
+            self.0.args(args);
+            self
+        }
 
-        fn env<K: AsRef<OsStr>, V: AsRef<OsStr>>(mut self, key: K, value: V) -> Self {
+        fn env<K: AsRef<OsStr>, V: AsRef<OsStr>>(
+            mut self,
+            key: K,
+            value: V,
+        ) -> Self {
             self.0.env(key, value);
             self
         }
@@ -53,7 +64,7 @@ mod tests {
 
     impl MockCommand {
         fn new(_cmd: &str) -> Self {
-            MockCommand {
+            Self {
                 status: ExitStatus::from_raw(0),
                 stdout: Vec::new(),
                 stderr: Vec::new(),
@@ -62,7 +73,7 @@ mod tests {
             }
         }
 
-        fn status(mut self, status: ExitStatus) -> Self {
+        const fn status(mut self, status: ExitStatus) -> Self {
             self.status = status;
             self
         }
@@ -75,7 +86,7 @@ mod tests {
 
     impl CommandRunner for MockCommand {
         fn new(cmd: &str) -> Self {
-            MockCommand::new(cmd)
+            Self::new(cmd)
         }
 
         fn args<I, S>(mut self, args: I) -> Self
@@ -83,12 +94,22 @@ mod tests {
             I: IntoIterator<Item = S>,
             S: AsRef<OsStr>,
         {
-            self.args.extend(args.into_iter().map(|s| s.as_ref().to_string_lossy().to_string()));
+            self.args.extend(
+                args.into_iter()
+                    .map(|s| s.as_ref().to_string_lossy().to_string()),
+            );
             self
         }
 
-        fn env<K: AsRef<OsStr>, V: AsRef<OsStr>>(mut self, key: K, value: V) -> Self {
-            self.env.push((key.as_ref().to_string_lossy().to_string(), value.as_ref().to_string_lossy().to_string()));
+        fn env<K: AsRef<OsStr>, V: AsRef<OsStr>>(
+            mut self,
+            key: K,
+            value: V,
+        ) -> Self {
+            self.env.push((
+                key.as_ref().to_string_lossy().to_string(),
+                value.as_ref().to_string_lossy().to_string(),
+            ));
             self
         }
 
@@ -112,7 +133,10 @@ mod tests {
             .expect("Failed to execute 'cargo install cargo-watch'.");
 
         assert!(cmd.status.success());
-        assert_eq!(String::from_utf8(cmd.stdout).unwrap(), "cargo-watch installed successfully");
+        assert_eq!(
+            String::from_utf8(cmd.stdout).unwrap(),
+            "cargo-watch installed successfully"
+        );
     }
 
     #[test]
@@ -126,6 +150,9 @@ mod tests {
             .expect("Failed to execute 'cargo watch' for generating documentation.");
 
         assert!(cmd.status.success());
-        assert_eq!(String::from_utf8(cmd.stdout).unwrap(), "Documentation generated successfully");
+        assert_eq!(
+            String::from_utf8(cmd.stdout).unwrap(),
+            "Documentation generated successfully"
+        );
     }
 }

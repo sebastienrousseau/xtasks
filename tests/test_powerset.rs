@@ -14,7 +14,7 @@ mod tests {
     fn test_default_powerset() {
         let powerset = PowersetBuilder::default().build().unwrap();
         assert_eq!(powerset.depth, 2);
-        assert_eq!(powerset.exclude_no_default_features, false);
+        assert!(!powerset.exclude_no_default_features);
     }
 
     /// Tests the creation of a `Powerset` instance with a custom `depth` value.
@@ -27,7 +27,8 @@ mod tests {
     /// The `Powerset` instance is created successfully with the `depth` field set to 3.
     #[test]
     fn test_custom_powerset() {
-        let powerset = PowersetBuilder::default().depth(3).build().unwrap();
+        let powerset =
+            PowersetBuilder::default().depth(3).build().unwrap();
         assert_eq!(powerset.depth, 3);
     }
 
@@ -42,7 +43,8 @@ mod tests {
     /// and the `depth` field is set correctly.
     #[test]
     fn test_powerset_functionality() {
-        let powerset = PowersetBuilder::default().depth(3).build().unwrap();
+        let powerset =
+            PowersetBuilder::default().depth(3).build().unwrap();
         assert_eq!(powerset.depth, 3);
     }
 
@@ -58,9 +60,11 @@ mod tests {
     /// and the original and deserialized `Powerset` instances are equal.
     #[test]
     fn test_serialization() {
-        let powerset = PowersetBuilder::default().depth(3).build().unwrap();
+        let powerset =
+            PowersetBuilder::default().depth(3).build().unwrap();
         let serialized = serde_json::to_string(&powerset).unwrap();
-        let deserialized: Powerset = serde_json::from_str(&serialized).unwrap();
+        let deserialized: Powerset =
+            serde_json::from_str(&serialized).unwrap();
         assert_eq!(powerset, deserialized);
     }
 }

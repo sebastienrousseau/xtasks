@@ -1,7 +1,7 @@
 // Copyright © 2023 xtasks. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-//! # Cargo XTask
+//! # Cargo `XTask`
 //!
 //! A collection of tasks to be executed with `cargo xtask`.
 //!
@@ -56,20 +56,17 @@
 //! This collection of cargo xtasks is distributed under the terms of both the MIT license and
 //! the Apache License (Version 2.0). See LICENSE-APACHE and LICENSE-MIT for details.
 
-#[cfg(feature = "cli")]
-use clap;
-
-use clap::{Arg, Command};
-use anyhow::{Context, Result as AnyResult};
-// use derive_builder::Builder;
-use duct::cmd;
 use crate::tasks::{
-    bloat::{bloat_deps, bloat_time},
+    bloat::{deps, time},
     ci::ci,
     coverage::coverage,
     docs::docs,
     powerset::powerset,
 };
+use anyhow::{Context, Result as AnyResult};
+use clap::{Arg, Command};
+use duct::cmd;
+use std::env;
 
 /// Analyses the dependencies of the current project to find which ones contribute most to the build size.
 pub mod bloat;
@@ -86,24 +83,61 @@ pub mod docs;
 /// Easily extend and customize tasks to suit the unique requirements of your project.
 pub mod powerset;
 
+/// Runs a specified command with `watch`, `-x check`, and `-x test` arguments.
 ///
-/// Watch changes and after every change: `cargo check`, followed by `cargo test`
-/// If `cargo check` fails, tests will not run.
+/// This function is intended to be used for development purposes, enabling live
+/// reloading and automatic execution of checks and tests upon code changes.
+///
+/// # Arguments
+///
+/// * `command`: The command to run, typically "cargo".
+///
+/// # Returns
+///
+/// * `AnyResult<()>`: An `Ok(())` variant if the command runs successfully, or an `Err` variant
+///   encapsulating any error that occurs during execution.
 ///
 /// # Errors
-/// Errors if the command failed
 ///
-pub fn dev() -> AnyResult<()> {
-    cmd!("cargo", "watch", "-x", "check", "-x", "test").run()?;
+/// This function will return an error if the external command fails to run, or if any other
+/// error occurs during execution.
+pub fn dev_with_command(command: &str) -> AnyResult<()> {
+    cmd!(command, "watch", "-x", "check", "-x", "test").run()?;
     Ok(())
 }
 
+/// Convenience function to run the `cargo watch` command with `-x check` and `-x test` arguments.
 ///
-/// Instal cargo tools
+/// This function is a wrapper around `dev_with_command`, providing a simpler interface for the
+/// common use case of running `cargo watch`.
+///
+/// # Returns
+///
+/// * `AnyResult<()>`: An `Ok(())` variant if the command runs successfully, or an `Err` variant
+///   encapsulating any error that occurs during execution.
 ///
 /// # Errors
-/// Errors if one of the commands failed
 ///
+/// This function will return an error if the `cargo watch` command fails to run, or if any other
+/// error occurs during execution.
+pub fn dev() -> AnyResult<()> {
+    dev_with_command("cargo")
+}
+
+/// Installs various cargo tools and Rust components required for development.
+///
+/// This function executes a series of commands to install `cargo-watch`, `cargo-hack`,
+/// `cargo-bloat`, and `grcov`. It also adds the `llvm-tools-preview` component via `rustup`.
+///
+/// # Returns
+///
+/// * `AnyResult<()>`: An `Ok(())` variant if all commands run successfully, or an `Err` variant
+///   encapsulating any error that occurs during execution.
+///
+/// # Errors
+///
+/// This function will return an error if any of the installation commands fail to run,
+/// or if any other error occurs during execution.
 pub fn install() -> AnyResult<()> {
     cmd!("cargo", "install", "cargo-watch").run()?;
     cmd!("cargo", "install", "cargo-hack").run()?;
@@ -113,14 +147,28 @@ pub fn install() -> AnyResult<()> {
     Ok(())
 }
 
-/// Set up a main for your xtask. Uses clap.
-/// To customize, look at this function's source and copy it to your
-/// own xtask project.
+/// Sets up the main command-line interface for your xtask project and executes
+/// the specified subcommands.
+///
+/// This function configures and executes various subcommands using `clap`. The available subcommands
+/// include `coverage`, `vars`, `ci`, `powerset`, `bloat-deps`, `bloat-time`, and `docs`.
+///
+/// # Arguments
+///
+/// * `args`: A slice of strings representing the command-line arguments.
+///
+/// # Returns
+///
+/// * `AnyResult<()>`: An `Ok(())` variant if the executed subcommand (if any) runs successfully,
+///   or an `Err` variant encapsulating any error that occurs during execution.
 ///
 /// # Errors
 ///
-/// This function will return an error if any command failed
-pub fn main() -> AnyResult<()> {
+/// This function will return an error if:
+/// - Any subcommand fails to run.
+/// - Required arguments for a subcommand are missing.
+/// - There is a problem in setting up or executing the command-line interface.
+pub fn main_with_args(args: &[String]) -> AnyResult<()> {
     let cli = Command::new("xtask")
         .subcommand(
             Command::new("coverage").arg(
@@ -152,23 +200,25 @@ pub fn main() -> AnyResult<()> {
             ),
         )
         .subcommand(Command::new("docs"));
-    let matches = cli.get_matches();
+    let matches = cli.get_matches_from(args);
 
-    let root = crate::ops::root_dir();
     let res = match matches.subcommand() {
         Some(("vars", _)) => {
+            let root = crate::ops::root_dir();
             println!("root: {root:?}");
             Ok(())
         }
         Some(("ci", _)) => ci(),
-        Some(("coverage", _)) => coverage(matches.contains_id("dev")),
+        Some(("coverage", matches)) => {
+            coverage(matches.contains_id("dev"))
+        }
         Some(("docs", _)) => docs(),
         Some(("powerset", _)) => powerset(),
-        Some(("bloat-deps", sm)) => bloat_deps(
+        Some(("bloat-deps", sm)) => deps(
             sm.get_one::<String>("package")
                 .context("please provide a package with -p")?,
         ),
-        Some(("bloat-time", sm)) => bloat_time(
+        Some(("bloat-time", sm)) => time(
             sm.get_one::<String>("package")
                 .context("please provide a package with -p")?,
         ),
@@ -177,3 +227,20 @@ pub fn main() -> AnyResult<()> {
     res
 }
 
+/// The main entry point of the application.
+///
+/// This function collects command-line arguments and passes them to `main_with_args` for
+/// further processing and execution of the appropriate subcommands.
+///
+/// # Returns
+///
+/// * `AnyResult<()>`: An `Ok(())` variant if the application runs successfully,
+///   or an `Err` variant encapsulating any error that occurs during execution.
+///
+/// # Errors
+///
+/// This function will propagate any errors returned by `main_with_args`.
+pub fn main() -> AnyResult<()> {
+    let args: Vec<String> = env::args().collect();
+    main_with_args(&args)
+}

@@ -1,13 +1,14 @@
-
 #[cfg(test)]
 mod tests {
-    use std::process::{Command, Output, ExitStatus};
-    use std::io::Result;
     use std::ffi::OsStr;
+    use std::io::Result;
     use std::os::unix::process::ExitStatusExt;
+    use std::process::{Command, ExitStatus, Output};
 
     trait CommandRunner {
-        fn new<S: AsRef<OsStr>>(program: S) -> Self where Self: Sized;
+        fn new<S: AsRef<OsStr>>(program: S) -> Self
+        where
+            Self: Sized;
         fn args<I, S>(self, args: I) -> Self
         where
             I: IntoIterator<Item = S>,
@@ -25,7 +26,7 @@ mod tests {
 
     impl CommandRunner for RealCommand {
         fn new<S: AsRef<OsStr>>(program: S) -> Self {
-            RealCommand(Command::new(program))
+            Self(Command::new(program))
         }
 
         fn args<I, S>(mut self, args: I) -> Self
@@ -61,7 +62,7 @@ mod tests {
 
     impl MockCommand {
         fn new(_cmd: &str) -> Self {
-            MockCommand {
+            Self {
                 status: ExitStatus::from_raw(0),
                 stdout: Vec::new(),
                 stderr: Vec::new(),
@@ -70,7 +71,7 @@ mod tests {
             }
         }
 
-        fn status(mut self, status: ExitStatus) -> Self {
+        const fn status(mut self, status: ExitStatus) -> Self {
             self.status = status;
             self
         }
@@ -79,12 +80,11 @@ mod tests {
             self.stdout = stdout.into();
             self
         }
-
     }
 
     impl CommandRunner for MockCommand {
         fn new<S: AsRef<OsStr>>(_cmd: S) -> Self {
-            MockCommand {
+            Self {
                 status: ExitStatus::from_raw(0),
                 stdout: Vec::new(),
                 stderr: Vec::new(),
@@ -98,7 +98,10 @@ mod tests {
             I: IntoIterator<Item = S>,
             S: AsRef<OsStr>,
         {
-            self.args.extend(args.into_iter().map(|s| s.as_ref().to_string_lossy().to_string()));
+            self.args.extend(
+                args.into_iter()
+                    .map(|s| s.as_ref().to_string_lossy().to_string()),
+            );
             self
         }
 
@@ -107,7 +110,10 @@ mod tests {
             K: AsRef<OsStr>,
             V: AsRef<OsStr>,
         {
-            self.env.push((key.as_ref().to_string_lossy().to_string(), value.as_ref().to_string_lossy().to_string()));
+            self.env.push((
+                key.as_ref().to_string_lossy().to_string(),
+                value.as_ref().to_string_lossy().to_string(),
+            ));
             self
         }
 
@@ -145,18 +151,17 @@ Jan 30 21:43:35.563  INFO cargo_tarpaulin::report: Coverage Results:
 || Tested/Total Lines:
 || src/lib.rs: 3/4
 || src/unused.rs: 0/3
-|| 
+||
 42.86% coverage, 3/7 lines covered
 ";
+        let cmd = MockCommand::new("cargo")
+            .args(["tarpaulin"])
+            .status(ExitStatus::from_raw(0))
+            .stdout(example_output.to_vec())
+            .spawn()
+            .expect("Failed to execute 'cargo tarpaulin'.");
 
-    let cmd = MockCommand::new("cargo")
-    .args(["tarpaulin"])
-    .status(ExitStatus::from_raw(0))
-    .stdout(example_output.to_vec())
-    .spawn()
-    .expect("Failed to execute 'cargo tarpaulin'.");
-
-    assert!(cmd.status.success());
-    assert_eq!(cmd.stdout, example_output);
+        assert!(cmd.status.success());
+        assert_eq!(cmd.stdout, example_output);
     }
 }

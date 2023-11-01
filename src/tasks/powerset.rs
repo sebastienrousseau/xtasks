@@ -110,7 +110,7 @@ impl PowersetBuilder {
     /// let builder = PowersetBuilder::new(3);
     /// ```
     pub fn new(depth: i32) -> Self {
-        let mut builder = PowersetBuilder::default();
+        let mut builder = Self::default();
         builder.depth(depth);
         builder
     }

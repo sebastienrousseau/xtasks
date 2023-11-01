@@ -101,7 +101,6 @@
 #![forbid(missing_docs)]
 #![forbid(unreachable_pub)]
 #![forbid(unsafe_code)]
-
 #![crate_name = "xtasks"]
 #![crate_type = "lib"]
 

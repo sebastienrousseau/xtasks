@@ -17,6 +17,8 @@ pub fn coverage(dev: bool) -> AnyResult<()> {
         cmd!("cargo", "tarpaulin", "--out", "Html")
     };
 
-    coverage_cmd.run().context("Failed to execute 'cargo tarpaulin' for code coverage")?;
+    coverage_cmd.run().context(
+        "Failed to execute 'cargo tarpaulin' for code coverage",
+    )?;
     Ok(())
 }
