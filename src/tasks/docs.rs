@@ -1,8 +1,8 @@
 // Copyright © 2023 xtasks. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+use crate::{run_command, run_std_command, tasks::cmd};
 use anyhow::{Context, Result as AnyResult};
-use duct::cmd;
 use std::process::Command;
 
 /// Generates and watches documentation for the current project.
@@ -20,9 +20,10 @@ pub fn docs() -> AnyResult<()> {
     ensure_cargo_watch_installed()?;
 
     // Execute the cargo watch command to build and watch the documentation
-    cmd!("cargo", "watch", "-s", "cargo doc --no-deps")
-        .run()
-        .with_context(|| "Failed to execute 'cargo watch' for generating documentation.")?;
+    run_command!(
+        cmd!("cargo", "watch", "-s", "cargo doc --no-deps"),
+        "Failed to execute 'cargo watch' for generating documentation"
+    );
 
     Ok(())
 }
@@ -33,16 +34,9 @@ pub fn docs() -> AnyResult<()> {
 ///
 /// Returns an `anyhow::Error` if the `cargo install cargo-watch` command fails to execute.
 pub fn ensure_cargo_watch_installed() -> AnyResult<()> {
-    let output = Command::new("cargo")
-        .args(["install", "cargo-watch"])
-        .output()
-        .with_context(|| "Failed to install 'cargo-watch'.")?;
-
-    if !output.status.success() {
-        return Err(anyhow::Error::msg(
-            "Failed to install 'cargo-watch'. Please ensure you have the necessary permissions.",
-        ));
-    }
-
+    run_std_command!(
+        Command::new("cargo").args(["install", "cargo-watch"]),
+        "Failed to install 'cargo-watch'"
+    );
     Ok(())
 }

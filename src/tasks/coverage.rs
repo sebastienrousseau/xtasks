@@ -1,6 +1,6 @@
+use crate::run_command;
 use anyhow::{Context, Result as AnyResult};
 use duct::cmd;
-use crate::run_command;
 
 /// Generates a code coverage report for the current project.
 ///
@@ -19,6 +19,9 @@ pub fn coverage(dev: bool) -> AnyResult<()> {
         cmd!("cargo", "tarpaulin", "--out", "Html")
     };
 
-    run_command!(coverage_cmd, "Failed to execute 'cargo tarpaulin' for code coverage");
+    run_command!(
+        coverage_cmd,
+        "Failed to execute 'cargo tarpaulin' for code coverage"
+    );
     Ok(())
 }

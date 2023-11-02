@@ -25,16 +25,4 @@ mod tests {
         );
         assert!(result.is_ok());
     }
-
-    // #[test]
-    // fn test_main_with_ci_command() {
-    //     let args = vec!["xtask", "ci"];
-    //     let result = main_with_args(
-    //         &args
-    //             .into_iter()
-    //             .map(String::from)
-    //             .collect::<Vec<String>>(),
-    //     );
-    //     assert!(result.is_ok());
-    // }
 }

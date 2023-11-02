@@ -40,9 +40,8 @@ macro_rules! print {
     };
 }
 
-/// # Assertion Macros
 /// Macros related to asserting conditions in the code.
-
+///
 /// Asserts that a condition is true, and panics with a formatted message if it is not.
 ///
 /// # Parameters
@@ -101,9 +100,8 @@ macro_rules! macro_log_info {
     }};
 }
 
-/// # Command Execution Macros
 /// Macros related to executing shell commands.
-
+///
 /// Executes a shell command, logs the start and completion of the operation, and handles any errors that occur.
 ///
 /// # Parameters
@@ -122,22 +120,44 @@ macro_rules! macro_log_info {
 #[macro_export]
 macro_rules! macro_execute_and_log {
     ($command:expr, $package:expr, $operation:expr, $start_message:expr, $complete_message:expr, $error_message:expr) => {{
-        use $crate::macro_log_info;
-        use $crate::loggers::{LogFormat, LogLevel};
         use anyhow::{Context, Result as AnyResult};
+        use $crate::loggers::{LogFormat, LogLevel};
+        use $crate::macro_log_info;
 
-        macro_log_info!(LogLevel::INFO, $operation, $start_message, LogFormat::CLF);
+        macro_log_info!(
+            LogLevel::INFO,
+            $operation,
+            $start_message,
+            LogFormat::CLF
+        );
 
         $command
             .run()
             .map(|_| ())
             .map_err(|err| {
-                macro_log_info!(LogLevel::ERROR, $operation, $error_message, LogFormat::CLF);
+                macro_log_info!(
+                    LogLevel::ERROR,
+                    $operation,
+                    $error_message,
+                    LogFormat::CLF
+                );
                 err
             })
-            .with_context(|| format!("Failed to execute '{}' for {} on package '{}'", stringify!($command), $operation, $package))?;
+            .with_context(|| {
+                format!(
+                    "Failed to execute '{}' for {} on package '{}'",
+                    stringify!($command),
+                    $operation,
+                    $package
+                )
+            })?;
 
-        macro_log_info!(LogLevel::INFO, $operation, $complete_message, LogFormat::CLF);
+        macro_log_info!(
+            LogLevel::INFO,
+            $operation,
+            $complete_message,
+            LogFormat::CLF
+        );
         Ok(())
     }};
 }
@@ -200,5 +220,61 @@ macro_rules! macro_cargo_cmd {
 macro_rules! run_command {
     ($cmd:expr, $context:expr) => {
         $cmd.run().context($context)?
+    };
+}
+
+/// Executes a standard command and provides context for any potential errors.
+///
+/// This macro simplifies the process of running a command using `std::process::Command`
+/// and handling any errors that may occur, by attaching a provided context message
+/// to the resulting error. This makes error messages more informative
+/// and helps in diagnosing issues more quickly.
+///
+/// # Parameters
+///
+/// * `$cmd`: The command to be executed. This should be an expression
+///   that evaluates to a type implementing the `std::process::Command` interface.
+/// * `$context`: A string expression providing context for the command.
+///   This message will be attached to any errors that occur during the
+///   execution of the command.
+///
+/// # Errors
+///
+/// If the command fails to execute, or if the command returns a non-zero exit status,
+/// an error is returned with the attached context message and the command's output.
+///
+#[macro_export]
+macro_rules! run_std_command {
+    ($cmd:expr, $context:expr) => {
+        let output = $cmd.output().with_context(|| $context)?;
+        if !output.status.success() {
+            return Err(anyhow::Error::msg(format!(
+                "{}: {:?}",
+                $context, output
+            )));
+        }
+    };
+}
+
+/// Executes a cargo command and provides context for any potential errors.
+///
+/// This macro is a convenience wrapper around `run_std_command`, specifically
+/// tailored for executing cargo commands. It ensures consistent error handling
+/// and provides informative error messages.
+///
+/// # Parameters
+///
+/// * `$args`: An expression that evaluates to an iterator of arguments for the cargo command.
+/// * `$context`: A string expression providing context for the command.
+///
+/// # Errors
+///
+/// If the cargo command fails to execute, or if the command returns a non-zero exit status,
+/// an error is returned with the attached context message and the command's output.
+///
+#[macro_export]
+macro_rules! run_cargo_command {
+    ($args:expr, $context:expr) => {
+        run_std_command!(Command::new("cargo").args($args), $context)
     };
 }
