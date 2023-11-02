@@ -34,6 +34,34 @@ jobs:
             target/
           key: test-${{ runner.os }}-cargo-${{ matrix.toolchain }}-${{ hashFiles('**/Cargo.lock') }}
 
+      # Install Cargo Audit
+      - name: Install cargo-audit
+        run: cargo install cargo-audit
+
+      # Install Cargo Boat
+      - name: Install cargo-bloat
+        run: cargo install cargo-bloat
+
+      # Install Cargo Clippy
+      - name: Install cargo-clippy
+        run: cargo install cargo-clippy
+
+      # Install Cargo Hack
+      - name: Install cargo-hack
+        run: cargo install cargo-hack
+
+      # Install Cargo Tarpaulin
+      - name: Install cargo-tarpaulin
+        run: cargo install cargo-tarpaulin
+
+      # Install Cargo Update
+      - name: Install cargo-update
+        run: cargo install cargo-update
+
+      # Install Cargo Watch
+      - name: Install cargo-watch
+        run: cargo install cargo-watch
+
       # Run tests with all features
       - name: Run tests with all features
         id: run-tests-all-features
