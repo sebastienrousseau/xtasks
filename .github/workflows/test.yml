@@ -42,10 +42,6 @@ jobs:
       - name: Install cargo-bloat
         run: cargo install cargo-bloat
 
-      # Install Cargo Clippy
-      - name: Install cargo-clippy
-        run: cargo install cargo-clippy
-
       # Install Cargo Hack
       - name: Install cargo-hack
         run: cargo install cargo-hack
