@@ -2,16 +2,16 @@
 
 <img
   align="right"
-  alt="Logo of xtasks"
+  alt="Logo of XTasks"
   height="261"
   src="https://kura.pro/xtasks/images/logos/xtasks.webp"
-  title="Logo of xtasks"
+  title="Logo of XTasks"
   width="261"
   />
 
 <!-- markdownlint-enable MD033 MD041 -->
 
-# xtasks
+# XTasks
 
 Essential tools and tasks for Rust projects using the xtask pattern, simplifying
 common build and development workflows.
@@ -20,7 +20,7 @@ common build and development workflows.
 <center>
 <!-- markdownlint-enable MD033 MD041 -->
 
-![Banner of xtasks][banner]
+![Banner of XTasks][banner]
 
 [![Made With Rust][made-with-rust-badge]][14] [![Crates.io][crates-badge]][8] [![Lib.rs][libs-badge]][10] [![Docs.rs][docs-badge]][9] [![License][license-badge]][3] [![Codecov][codecov-badge]][15]
 
@@ -34,14 +34,14 @@ common build and development workflows.
 
 ## Overview
 
-`xtasks` is a comprehensive Rust library designed to facilitate common
+`XTasks` is a comprehensive Rust library designed to facilitate common
 operations and tasks in projects that adhere to the xtask pattern. This pattern
 is prevalent in the Rust ecosystem, where it is used to define custom build,
 test, and deployment scripts within a project’s workspace.
 
 ## Table of Contents
 
-- [xtasks](#xtasks)
+- [XTasks](#xtasks)
   - [Overview](#overview)
   - [Table of Contents](#table-of-contents)
   - [Getting Started](#getting-started)
@@ -64,7 +64,7 @@ You will need Rust and Cargo installed on your system. If you don't have them in
 
 ### Installation
 
-To use `xtasks`, add it as a dependency to your `Cargo.toml` file:
+To use `XTasks`, add it as a dependency to your `Cargo.toml` file:
 
 ```shell
 [dependencies]
@@ -79,7 +79,7 @@ extern crate xtasks;
 
 ## Usage
 
-You can use `xtasks` to simplify and standardize the process of building,
+You can use `XTasks` to simplify and standardize the process of building,
 testing, and deploying your Rust projects. For more detailed usage examples,
 please refer to the library's documentation.
 
@@ -93,7 +93,7 @@ cargo test
 
 ## Semantic Versioning Policy
 
-For transparency into our release cycle and in striving to maintain backward compatibility, xtasks Static Site Generator (SSG) follows [semantic versioning][7].
+For transparency into our release cycle and in striving to maintain backward compatibility, XTasks follows [semantic versioning][7].
 
 ## License
 
@@ -125,7 +125,7 @@ A special thank you goes to the [Rust Reddit][13] community for providing a lot 
 [5]: https://github.com/sebastienrousseau/xtasks/blob/main/CONTRIBUTING.md "Contributing"
 [6]: https://github.com/sebastienrousseau/xtasks/graphs/contributors "Contributors"
 [7]: http://semver.org/ "Semantic Versioning"
-[8]: https://crates.io/crates/ssg "Crate.io"
+[8]: https://crates.io/crates/xtasks "Crate.io"
 [9]: https://docs.rs/crate/xtasks/ "Docs.rs"
 [10]: https://lib.rs/crates/xtasks "Lib.rs"
 [11]: https://github.com/sebastienrousseau/xtasks/actions "Actions"

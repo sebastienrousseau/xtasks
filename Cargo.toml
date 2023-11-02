@@ -15,7 +15,7 @@ common build and development workflows.
 documentation = "https://docs.rs/xtasks"
 edition = "2021"
 exclude = ["/.git/*", "/.github/*", "/.gitignore", "/.vscode/*"]
-homepage = "https://shokunin.one"
+homepage = "https://xtasks.pro"
 keywords = ["xtasks"]
 license = "MIT OR Apache-2.0"
 name = "xtasks"
