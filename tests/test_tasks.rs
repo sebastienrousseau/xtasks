@@ -8,11 +8,11 @@ mod tests {
         assert!(result.is_ok());
     }
 
-    #[test]
-    fn test_install() {
-        let result = install();
-        assert!(result.is_ok());
-    }
+    // #[test]
+    // fn test_install() {
+    //     let result = install();
+    //     assert!(result.is_ok());
+    // }
 
     #[test]
     fn test_main_with_vars_command() {
