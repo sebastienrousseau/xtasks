@@ -59,8 +59,8 @@ jobs:
         run: cargo install cargo-update --force
 
       # Install Cargo Watch
-      - name: Install cargo-watch --force
-        run: cargo install cargo-watch
+      - name: Install cargo-watch
+        run: cargo install cargo-watch --force
 
       # Run tests with all features
       - name: Run tests with all features
