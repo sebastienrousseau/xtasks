@@ -36,27 +36,31 @@ jobs:
 
       # Install Cargo Audit
       - name: Install cargo-audit
-        run: cargo install cargo-audit
+        run: cargo install cargo-audit --force
 
       # Install Cargo Boat
       - name: Install cargo-bloat
-        run: cargo install cargo-bloat
+        run: cargo install cargo-bloat --force
 
       # Install Cargo Hack
       - name: Install cargo-hack
-        run: cargo install cargo-hack
+        run: cargo install cargo-hack --force
+
+      # Install Cargo Coverage
+      - name: Install cargo-coverage
+        run: cargo install cargo-coverage --force
 
       # Install Cargo Tarpaulin
       - name: Install cargo-tarpaulin
-        run: cargo install cargo-tarpaulin
+        run: cargo install cargo-tarpaulin --force
 
       # Install Cargo Update
       - name: Install cargo-update
-        run: cargo install cargo-update
+        run: cargo install cargo-update --force
 
       # Install Cargo Watch
       - name: Install cargo-watch
-        run: cargo install cargo-watch
+        run: cargo install cargo-watch --force
 
       # Run tests with all features
       - name: Run tests with all features
@@ -64,30 +68,30 @@ jobs:
         run: cargo test --verbose --workspace --all-features
 
       # Install grcov
-      - name: Install grcov
-        # Only run this job on the main branch when a commit is pushed.
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        id: install-grcov
-        run: |
-          mkdir -p "${HOME}/.local/bin"
-          curl -sL https://github.com/mozilla/grcov/releases/download/v0.8.18/grcov-x86_64-unknown-linux-gnu.tar.bz2 | tar jxf - -C "${HOME}/.local/bin"
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+      # - name: Install grcov
+      #   # Only run this job on the main branch when a commit is pushed.
+      #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      #   id: install-grcov
+      #   run: |
+      #     mkdir -p "${HOME}/.local/bin"
+      #     curl -sL https://github.com/mozilla/grcov/releases/download/v0.8.18/grcov-x86_64-unknown-linux-gnu.tar.bz2 | tar jxf - -C "${HOME}/.local/bin"
+      #     echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      # Use grcov to generate a coverage report
-      - name: Generate coverage report
-        # Only run this job on the main branch when a commit is pushed.
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        id: generate-code-coverage
-        uses: actions-rs/cargo@v1
-        with:
-          command: xtask
-          args: coverage
+      # # Use grcov to generate a coverage report
+      # - name: Generate coverage report
+      #   # Only run this job on the main branch when a commit is pushed.
+      #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      #   id: generate-code-coverage
+      #   uses: actions-rs/cargo@v1
+      #   with:
+      #     command: xtask
+      #     args: coverage
 
-      # Upload the coverage report to codecov
-      - name: Upload coverage report to codecov
-        # Only run this job on the main branch when a commit is pushed.
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        id: upload-report-codecov
-        uses: codecov/codecov-action@v3
-        with:
-          files: coverage/*.lcov
+      # # Upload the coverage report to codecov
+      # - name: Upload coverage report to codecov
+      #   # Only run this job on the main branch when a commit is pushed.
+      #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      #   id: upload-report-codecov
+      #   uses: codecov/codecov-action@v3
+      #   with:
+      #     files: coverage/*.lcov

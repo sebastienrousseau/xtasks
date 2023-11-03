@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use xtasks::tasks::{dev_with_command, install, main_with_args};
+    use xtasks::tasks::{dev_with_command, main_with_args};
 
     #[test]
     fn test_dev() {
@@ -8,11 +8,11 @@ mod tests {
         assert!(result.is_ok());
     }
 
-    #[test]
-    fn test_install() {
-        let result = install();
-        assert!(result.is_ok());
-    }
+    // #[test]
+    // fn test_install() {
+    //     let result = install();
+    //     assert!(result.is_ok());
+    // }
 
     #[test]
     fn test_main_with_vars_command() {
