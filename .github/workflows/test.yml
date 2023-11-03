@@ -36,27 +36,27 @@ jobs:
 
       # Install Cargo Audit
       - name: Install cargo-audit
-        run: cargo install cargo-audit
+        run: cargo install cargo-audit --force
 
       # Install Cargo Boat
       - name: Install cargo-bloat
-        run: cargo install cargo-bloat
+        run: cargo install cargo-bloat --force
 
       # Install Cargo Hack
       - name: Install cargo-hack
-        run: cargo install cargo-hack
+        run: cargo install cargo-hack --force
 
       # Install Cargo Coverage
       - name: Install cargo-coverage
-        run: cargo install cargo-coverage
+        run: cargo install cargo-coverage --force
 
       # Install Cargo Tarpaulin
       - name: Install cargo-tarpaulin
-        run: cargo install cargo-tarpaulin
+        run: cargo install cargo-tarpaulin --force
 
       # Install Cargo Update
       - name: Install cargo-update
-        run: cargo install cargo-update
+        run: cargo install cargo-update --force
 
       # Install Cargo Watch
       - name: Install cargo-watch
