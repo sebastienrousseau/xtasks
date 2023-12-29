@@ -1,15 +1,17 @@
 // Copyright © 2023 xtasks. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-use anyhow::{Result, anyhow};
+use anyhow::{anyhow, Result};
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use std::cell::RefCell;
 
+    type MockMainFnType = Box<dyn Fn() -> Result<()> + Send>;
+
     thread_local! {
-        static MOCK_MAIN_FN: RefCell<Option<Box<dyn Fn() -> Result<()> + Send>>> = RefCell::new(None);
+        static MOCK_MAIN_FN: RefCell<Option<MockMainFnType>> = RefCell::new(None);
     }
 
     fn set_mock_main_fn<F>(mock_fn: F)

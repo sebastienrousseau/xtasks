@@ -32,7 +32,7 @@ pub fn deps(package: &str) -> AnyResult<()> {
 
     cmd!("cargo", "bloat", "-p", package, "--crates")
         .run()
-        .map(|_| ())  // Convert Ok(Output) to Ok(())
+        .map(|_| ())
         .map_err(|err| {
             // Log the error and then return it
             let log = macro_log!(
