@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 //!
-//! # XTasks
+//! # `XTasks`
 //!
 //! [![XTasks Logo](https://kura.pro/xtasks/images/banners/banner-xtasks.webp)][00]
 //!
@@ -104,8 +104,6 @@
 #![crate_name = "xtasks"]
 #![crate_type = "lib"]
 
-/// The `loggers` module contains functions for logging.
-pub mod loggers;
 /// The `macros` module offers a collection of convenient macros designed to expedite common operations,
 /// reducing boilerplate and enhancing code readability.
 pub mod macros;

@@ -201,6 +201,7 @@ pub fn main_with_args(args: &[String]) -> AnyResult<()> {
         )
         .subcommand(Command::new("docs"));
     let matches = cli.get_matches_from(args);
+    println!("Received subcommand: {:?}", matches.subcommand());
 
     let res = match matches.subcommand() {
         Some(("vars", _)) => {
@@ -208,7 +209,7 @@ pub fn main_with_args(args: &[String]) -> AnyResult<()> {
             println!("root: {root:?}");
             Ok(())
         }
-        Some(("ci", _)) => ci(),
+        Some(("ci", _)) | None => crate::tasks::ci(),
         Some(("coverage", matches)) => {
             coverage(matches.contains_id("dev"))
         }
@@ -222,7 +223,10 @@ pub fn main_with_args(args: &[String]) -> AnyResult<()> {
             sm.get_one::<String>("package")
                 .context("please provide a package with -p")?,
         ),
-        _ => unreachable!("unreachable branch"),
+        _ => {
+            eprintln!("Error: Unrecognized subcommand");
+            Err(anyhow::Error::msg("Unrecognized subcommand"))
+        }
     };
     res
 }

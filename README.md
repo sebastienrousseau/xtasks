@@ -68,7 +68,7 @@ To use `XTasks`, add it as a dependency to your `Cargo.toml` file:
 
 ```shell
 [dependencies]
-xtasks = "0.0.1"
+xtasks = "0.0.2"
 ```
 
 Then, in your `lib.rs` or `main.rs` file, add:

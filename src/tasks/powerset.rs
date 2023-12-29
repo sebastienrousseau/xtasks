@@ -58,14 +58,15 @@ impl PowersetBuilder {
             .build()
             .context("Failed to build Powerset configuration")?;
         let depth = t.depth.to_string();
-        let mut common_args = vec![
-            "--workspace",
-            "--exclude",
-            "xtask",
-            "--feature-powerset",
-            "--depth",
-            &depth,
-        ];
+        let mut common_args =
+            vec![
+                "--workspace",
+                "--exclude",
+                "xtask",
+                "--feature-powerset",
+                "--depth",
+                &depth,
+            ];
         if t.exclude_no_default_features {
             common_args.push("--exclude-no-default-features");
         }
