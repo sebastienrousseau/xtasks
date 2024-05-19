@@ -3,7 +3,7 @@
 
 use xtasks::tasks::powerset::{powerset, PowersetBuilder};
 
-pub fn main() {
+pub(crate) fn main() {
     // Example of creating a PowersetBuilder with a specific depth
     let builder = PowersetBuilder::new(3);
     // Running the powerset test with the specified builder configuration

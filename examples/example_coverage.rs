@@ -3,7 +3,7 @@
 
 use xtasks::tasks::coverage::coverage;
 
-pub fn main() {
+pub(crate) fn main() {
     // Generate a development-specific HTML code coverage report
     if let Err(e) = coverage(true) {
         eprintln!(

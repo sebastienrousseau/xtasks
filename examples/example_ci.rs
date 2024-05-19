@@ -4,7 +4,7 @@
 use anyhow::Context;
 use xtasks::tasks::ci::CIBuilder;
 
-pub fn main() -> anyhow::Result<()> {
+pub(crate) fn main() -> anyhow::Result<()> {
     // Create a CI builder with custom settings
     let ci_builder = CIBuilder::default()
         .nightly(true) // Set to use the nightly compiler

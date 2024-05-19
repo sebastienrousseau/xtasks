@@ -4,7 +4,7 @@
 use xtasks::tasks::docs::docs;
 use xtasks::tasks::docs::ensure_cargo_watch_installed;
 
-pub fn main() {
+pub(crate) fn main() {
     // Ensure that the cargo-watch tool is installed
     if let Err(e) = ensure_cargo_watch_installed() {
         eprintln!("Failed to ensure cargo-watch is installed: {:?}", e);

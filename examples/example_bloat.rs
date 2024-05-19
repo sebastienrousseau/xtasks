@@ -3,7 +3,7 @@
 
 use xtasks::tasks::bloat::{deps, time};
 
-pub fn main() {
+pub(crate) fn main() {
     // Example usage of the `deps` function to analyze the dependencies of a package
     let package_name = "dtt";
     if let Err(e) = deps(package_name) {
