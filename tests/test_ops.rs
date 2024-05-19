@@ -45,7 +45,7 @@ mod tests {
     fn test_remove_dir_non_existent() {
         let tmp_dir = tempdir().unwrap();
         let non_existent_dir = tmp_dir.path().join("nonexistent");
-        assert!(remove_dir(&non_existent_dir).is_err());
+        assert!(remove_dir(non_existent_dir).is_err());
     }
 
     #[test]
@@ -97,6 +97,6 @@ mod tests {
     fn test_remove_file_non_existent() {
         let tmp_dir = tempdir().unwrap();
         let non_existent_file = tmp_dir.path().join("nonexistent.txt");
-        assert!(remove_file(&non_existent_file).is_err());
+        assert!(remove_file(non_existent_file).is_err());
     }
 }
