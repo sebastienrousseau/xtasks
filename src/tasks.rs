@@ -209,7 +209,7 @@ pub fn main_with_args(args: &[String]) -> AnyResult<()> {
             println!("root: {root:?}");
             Ok(())
         }
-        Some(("ci", _)) | None => crate::tasks::ci(),
+        Some(("ci", _)) | None => ci(),
         Some(("coverage", matches)) => {
             coverage(matches.contains_id("dev"))
         }

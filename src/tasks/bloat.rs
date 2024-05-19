@@ -5,8 +5,8 @@ use anyhow::{Context, Result as AnyResult};
 use duct::cmd;
 
 use dtt::DateTime;
-use rlg::{macro_log, LogFormat, LogLevel};
-use vrd::Random;
+use rlg::{log_format::LogFormat, log_level::LogLevel, macro_log};
+use vrd::random::Random;
 
 /// Analyses the dependencies of the current project to find which ones contribute most to the build size.
 ///

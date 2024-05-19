@@ -10,7 +10,6 @@
 // and later, this is often optional due to automatic crate linking. However, including it
 // explicitly can make dependencies clearer. Here, it links the `xtasks` crate, presumably
 // a library crate part of the same project.
-extern crate xtasks;
 
 // The `main` function is the entry point of the Rust binary. The `fn main() -> Result<(), E>`
 // signature is a common pattern for binaries that may return an error. Here, `E` is specified
