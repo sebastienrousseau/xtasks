@@ -1,6 +1,8 @@
 // Copyright © 2023-2024 xtasks. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+//! This crate provides tasks for analysing the bloat of a package.
+
 use xtasks::tasks::bloat::{deps, time};
 
 #[allow(clippy::redundant_pub_crate)]

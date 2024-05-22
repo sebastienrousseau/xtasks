@@ -1,6 +1,8 @@
 // Copyright © 2023-2024 xtasks. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+//! This crate provides tasks for performing a CI build with a powerset of features.
+
 use xtasks::tasks::powerset::{powerset, PowersetBuilder};
 
 #[allow(clippy::redundant_pub_crate)]

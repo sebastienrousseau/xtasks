@@ -1,6 +1,8 @@
 // Copyright © 2023-2024 xtasks. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+//! This crate provides example tasks for the xtasks crate.
+
 /// This is a module for bloat example task.
 mod example_bloat;
 /// This is a module for ci example task.
