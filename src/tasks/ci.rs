@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 ///
 #[derive(
     Builder,
+    Copy,
     Debug,
     Default,
     PartialEq,
@@ -20,7 +21,6 @@ use serde::{Deserialize, Serialize};
     Deserialize,
 )]
 #[builder(setter(into))]
-#[derive(Copy)]
 pub struct CI {
     /// Determines whether to run the CI tasks with the nightly version of the Rust compiler.
     ///

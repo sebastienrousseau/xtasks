@@ -11,6 +11,7 @@ use serde::{Deserialize, Serialize};
 /// or disabled for a cargo build.
 #[derive(
     Builder,
+    Copy,
     Debug,
     Default,
     PartialEq,
@@ -21,7 +22,6 @@ use serde::{Deserialize, Serialize};
     Deserialize,
 )]
 #[builder(setter(into))]
-#[derive(Copy)]
 pub struct Powerset {
     /// Specifies the depth of the powerset.
     ///
