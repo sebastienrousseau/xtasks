@@ -21,6 +21,7 @@ use serde::{Deserialize, Serialize};
     Deserialize,
 )]
 #[builder(setter(into))]
+#[derive(Copy)]
 pub struct Powerset {
     /// Specifies the depth of the powerset.
     ///
