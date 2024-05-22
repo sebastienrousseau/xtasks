@@ -1,4 +1,4 @@
-// Copyright © 2023 xtasks. All rights reserved.
+// Copyright © 2023-2024 xtasks. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 use anyhow::{anyhow, Result};
@@ -25,11 +25,9 @@ mod tests {
 
     fn main() -> Result<()> {
         MOCK_MAIN_FN.with(|mock| {
-            if let Some(mock_fn) = &*mock.borrow() {
-                (mock_fn)()
-            } else {
-                Ok(()) // Default behaviour or call the real implementation
-            }
+            (*mock.borrow())
+                .as_ref()
+                .map_or_else(|| Ok(()), |mock_fn| (mock_fn)())
         })
     }
 

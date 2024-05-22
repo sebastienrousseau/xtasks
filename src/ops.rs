@@ -1,4 +1,4 @@
-// Copyright © 2023 xtasks. All rights reserved.
+// Copyright © 2023-2024 xtasks. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 //! `xtasks` is a collection of building block operations such as copy, remove, confirm, and more
@@ -45,16 +45,13 @@ where
     if path.exists() {
         if path.is_file() {
             fs::remove_file(path).with_context(|| {
-                format!("Failed to remove file: {:?}", path)
+                format!("Failed to remove file: {path:?}")
             })
         } else {
-            Err(AnyError::msg(format!(
-                "Path is not a file: {:?}",
-                path
-            )))
+            Err(AnyError::msg(format!("Path is not a file: {path:?}")))
         }
     } else {
-        Err(AnyError::msg(format!("File does not exist: {:?}", path)))
+        Err(AnyError::msg(format!("File does not exist: {path:?}")))
     }
 }
 
@@ -132,8 +129,7 @@ pub fn confirm(question: &str) -> AnyResult<bool> {
         .interact()
         .with_context(|| {
             format!(
-                "Failed to get confirmation for question: {}",
-                question
+                "Failed to get confirmation for question: {question}"
             )
         })
         .map_err(|e| {
@@ -177,26 +173,29 @@ pub fn root_dir() -> PathBuf {
 /// - If any of the files or directories matching the glob pattern cannot be removed.
 pub fn clean_files(pattern: &str) -> AnyResult<()> {
     let entries = glob(pattern)
-        .with_context(|| format!("Invalid glob pattern: {}", pattern))?
+        .with_context(|| format!("Invalid glob pattern: {pattern}"))?
         .collect::<Result<Vec<_>, _>>()
         .with_context(|| {
-            format!("Failed to read glob pattern: {}", pattern)
+            format!("Failed to read glob pattern: {pattern}")
         })?;
 
     for entry in entries {
         if entry.is_file() {
             match fs::remove_file(&entry) {
-                Ok(_) => {
-                    info!("Successfully removed file: {:?}", entry)
+                Ok(()) => {
+                    info!("Successfully removed file: {:?}", entry);
                 }
                 Err(e) => {
-                    error!("Failed to remove file {:?}: {}", entry, e)
+                    error!("Failed to remove file {:?}: {}", entry, e);
                 }
             }
         } else if entry.is_dir() {
             match fs::remove_dir_all(&entry) {
-                Ok(_) => {
-                    info!("Successfully removed directory: {:?}", entry)
+                Ok(()) => {
+                    info!(
+                        "Successfully removed directory: {:?}",
+                        entry
+                    );
                 }
                 Err(e) => error!(
                     "Failed to remove directory {:?}: {}",
@@ -229,12 +228,11 @@ where
     let path = path.as_ref();
     if path.exists() {
         fs::remove_dir_all(path).with_context(|| {
-            format!("Failed to remove directory: {:?}", path)
+            format!("Failed to remove directory: {path:?}")
         })
     } else {
         Err(AnyError::msg(format!(
-            "Directory does not exist: {:?}",
-            path
+            "Directory does not exist: {path:?}"
         )))
     }
 }

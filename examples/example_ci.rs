@@ -1,9 +1,10 @@
-// Copyright © 2023 xtasks. All rights reserved.
+// Copyright © 2023-2024 xtasks. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 use anyhow::Context;
 use xtasks::tasks::ci::CIBuilder;
 
+#[allow(clippy::redundant_pub_crate)]
 pub(crate) fn main() -> anyhow::Result<()> {
     // Create a CI builder with custom settings
     let ci_builder = CIBuilder::default()

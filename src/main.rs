@@ -1,4 +1,4 @@
-// Copyright © 2023 xtasks. All rights reserved.
+// Copyright © 2023-2024 xtasks. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 // This line is a copyright notice. It's important for intellectual property rights and
@@ -15,6 +15,7 @@
 // signature is a common pattern for binaries that may return an error. Here, `E` is specified
 // as `anyhow::Error`, which means the function can return any error that implements the
 // `std::error::Error` trait, providing flexibility in error handling.
+#![allow(missing_docs)]
 fn main() -> Result<(), anyhow::Error> {
     // This line calls a function `main` within the `tasks` module of the `xtasks` crate.
     // This is the primary functionality of this binary. The `xtasks::tasks::main()` function

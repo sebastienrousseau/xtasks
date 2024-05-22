@@ -1,4 +1,4 @@
-// Copyright © 2023 xtasks. All rights reserved.
+// Copyright © 2023-2024 xtasks. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 use anyhow::{Context, Result as AnyResult};
@@ -58,15 +58,14 @@ impl PowersetBuilder {
             .build()
             .context("Failed to build Powerset configuration")?;
         let depth = t.depth.to_string();
-        let mut common_args =
-            vec![
-                "--workspace",
-                "--exclude",
-                "xtask",
-                "--feature-powerset",
-                "--depth",
-                &depth,
-            ];
+        let mut common_args = vec![
+            "--workspace",
+            "--exclude",
+            "xtasks",
+            "--feature-powerset",
+            "--depth",
+            &depth,
+        ];
         if t.exclude_no_default_features {
             common_args.push("--exclude-no-default-features");
         }
