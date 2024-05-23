@@ -53,26 +53,18 @@ impl CIBuilder {
         } = self.build().context("Failed to build CI configuration")?;
 
         if nightly {
-            let result = cmd!(
+            let _ = cmd!(
                 "rustup", "run", "nightly", "cargo", "fmt", "--",
                 "--check"
             )
             .run()
             .context(
                 "Failed to execute 'cargo fmt' with nightly compiler",
-            );
-
-            if let Err(e) = result {
-                return Err(e);
-            }
+            )?;
         } else {
-            let result = cmd!("cargo", "fmt", "--", "--check")
+            let _ = cmd!("cargo", "fmt", "--", "--check")
                 .run()
-                .context("Failed to execute 'cargo fmt'");
-
-            if let Err(e) = result {
-                return Err(e);
-            }
+                .context("Failed to execute 'cargo fmt'")?;
         }
 
         if clippy_max {
