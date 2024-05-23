@@ -20,13 +20,9 @@ pub fn coverage(dev: bool) -> AnyResult<()> {
     };
 
     // Capture the result of the macro call
-    let output = run_command!(
+    run_command!(
         coverage_cmd,
         "Failed to execute 'cargo tarpaulin' for code coverage"
     );
-
-    // Handle the output if needed
-    println!("Command executed successfully with output: {:?}", output);
-
     Ok(())
 }

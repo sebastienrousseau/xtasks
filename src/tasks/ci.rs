@@ -76,7 +76,7 @@ impl CIBuilder {
         }
 
         if clippy_max {
-            let result = cmd!(
+            let _ = cmd!(
                 "cargo",
                 "clippy",
                 "--all-targets",
@@ -90,30 +90,16 @@ impl CIBuilder {
                 "clippy::nursery"
             )
             .run()
-            .context("Failed to execute 'cargo clippy'");
-
-            if let Err(e) = result {
-                return Err(e);
-            }
+            .context("Failed to execute 'cargo clippy'")?;
         } else {
-            let result =
-                cmd!("cargo", "clippy", "--", "-D", "warnings")
-                    .run()
-                    .context("Failed to execute 'cargo clippy'");
-
-            if let Err(e) = result {
-                return Err(e);
-            }
+            let _ = cmd!("cargo", "clippy", "--", "-D", "warnings")
+                .run()
+                .context("Failed to execute 'cargo clippy'")?;
         }
 
-        let result = cmd!("cargo", "test")
+        let _ = cmd!("cargo", "test")
             .run()
-            .context("Failed to execute 'cargo test'");
-
-        if let Err(e) = result {
-            return Err(e);
-        }
-
+            .context("Failed to execute 'cargo test'")?;
         Ok(())
     }
 }
