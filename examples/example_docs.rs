@@ -1,6 +1,3 @@
-// Copyright © 2023-2024 xtasks. All rights reserved.
-// SPDX-License-Identifier: Apache-2.0 OR MIT
-
 //! This crate provides tasks for generating and watching documentation.
 
 use xtasks::tasks::docs::docs;

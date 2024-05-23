@@ -1,6 +1,3 @@
-// Copyright © 2023-2024 xtasks. All rights reserved.
-// SPDX-License-Identifier: Apache-2.0 OR MIT
-
 // This line is a copyright notice. It's important for intellectual property rights and
 // indicates the year of creation and the owner of the source code (in this case, xtasks).
 // The SPDX identifier specifies the license under which this code is distributed,

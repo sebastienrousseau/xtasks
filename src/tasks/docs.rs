@@ -1,6 +1,3 @@
-// Copyright © 2023-2024 xtasks. All rights reserved.
-// SPDX-License-Identifier: Apache-2.0 OR MIT
-
 use crate::{run_command, run_std_command, tasks::cmd};
 use anyhow::{Context, Result as AnyResult};
 use std::process::Command;
