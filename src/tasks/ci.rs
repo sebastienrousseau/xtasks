@@ -53,22 +53,30 @@ impl CIBuilder {
         } = self.build().context("Failed to build CI configuration")?;
 
         if nightly {
-            cmd!(
+            let result = cmd!(
                 "rustup", "run", "nightly", "cargo", "fmt", "--",
                 "--check"
             )
             .run()
             .context(
                 "Failed to execute 'cargo fmt' with nightly compiler",
-            )?;
+            );
+
+            if let Err(e) = result {
+                return Err(e);
+            }
         } else {
-            cmd!("cargo", "fmt", "--", "--check")
+            let result = cmd!("cargo", "fmt", "--", "--check")
                 .run()
-                .context("Failed to execute 'cargo fmt'")?;
+                .context("Failed to execute 'cargo fmt'");
+
+            if let Err(e) = result {
+                return Err(e);
+            }
         }
 
         if clippy_max {
-            cmd!(
+            let result = cmd!(
                 "cargo",
                 "clippy",
                 "--all-targets",
@@ -82,16 +90,30 @@ impl CIBuilder {
                 "clippy::nursery"
             )
             .run()
-            .context("Failed to execute 'cargo clippy'")?;
+            .context("Failed to execute 'cargo clippy'");
+
+            if let Err(e) = result {
+                return Err(e);
+            }
         } else {
-            cmd!("cargo", "clippy", "--", "-D", "warnings")
-                .run()
-                .context("Failed to execute 'cargo clippy'")?;
+            let result =
+                cmd!("cargo", "clippy", "--", "-D", "warnings")
+                    .run()
+                    .context("Failed to execute 'cargo clippy'");
+
+            if let Err(e) = result {
+                return Err(e);
+            }
         }
 
-        cmd!("cargo", "test")
+        let result = cmd!("cargo", "test")
             .run()
-            .context("Failed to execute 'cargo test'")?;
+            .context("Failed to execute 'cargo test'");
+
+        if let Err(e) = result {
+            return Err(e);
+        }
+
         Ok(())
     }
 }

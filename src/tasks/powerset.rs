@@ -1,3 +1,5 @@
+use std::process::Command;
+
 use anyhow::{Context, Result as AnyResult};
 use derive_builder::Builder;
 use serde::{Deserialize, Serialize};
@@ -70,27 +72,45 @@ impl PowersetBuilder {
 
         let mut clippy_args = common_args.clone();
         clippy_args.extend(["--", "-D", "warnings"]);
-        std::process::Command::new("cargo")
+        let status = Command::new("cargo")
             .args(["hack", "clippy"])
             .args(&clippy_args)
             .status()
             .context("Failed to execute 'cargo hack clippy'")?;
+        if !status.success() {
+            return Err(anyhow::anyhow!(
+                "Command 'cargo hack clippy' failed with status: {}",
+                status
+            ));
+        }
 
         let mut test_args = common_args.clone();
         test_args.push("test");
-        std::process::Command::new("cargo")
+        let status = Command::new("cargo")
             .args(["hack"])
             .args(&test_args)
             .status()
             .context("Failed to execute 'cargo hack test'")?;
+        if !status.success() {
+            return Err(anyhow::anyhow!(
+                "Command 'cargo hack test' failed with status: {}",
+                status
+            ));
+        }
 
         let mut doc_test_args = common_args;
         doc_test_args.extend(["test", "--doc"]);
-        std::process::Command::new("cargo")
+        let status = Command::new("cargo")
             .args(["hack"])
             .args(&doc_test_args)
             .status()
             .context("Failed to execute 'cargo hack test --doc'")?;
+        if !status.success() {
+            return Err(anyhow::anyhow!(
+                "Command 'cargo hack test --doc' failed with status: {}",
+                status
+            ));
+        }
 
         Ok(())
     }
@@ -109,7 +129,7 @@ impl PowersetBuilder {
     /// ```
     pub fn new(depth: i32) -> Self {
         let mut builder = Self::default();
-        builder.depth(depth);
+        let _ = builder.depth(depth); // Handle the unused result
         builder
     }
 }

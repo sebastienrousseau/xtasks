@@ -1,3 +1,5 @@
+#![allow(box_pointers)]
+
 use anyhow::{anyhow, Result};
 
 #[cfg(test)]

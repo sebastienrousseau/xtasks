@@ -145,7 +145,7 @@ pub fn confirm(question: &str) -> AnyResult<bool> {
 /// A `PathBuf` representing the root directory of the cargo project.
 pub fn root_dir() -> PathBuf {
     let mut xtask_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    xtask_dir.pop();
+    let _ = xtask_dir.pop();
     xtask_dir
 }
 

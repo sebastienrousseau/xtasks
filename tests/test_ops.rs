@@ -9,7 +9,7 @@ mod tests {
         let tmp_dir = tempdir().unwrap();
         let sub_dir = tmp_dir.path().join("subdir");
         fs::create_dir(&sub_dir).unwrap();
-        File::create(sub_dir.join("file.txt")).unwrap();
+        let _ = File::create(sub_dir.join("file.txt")).unwrap();
 
         // This should succeed as `remove_dir` now removes non-empty directories.
         assert!(remove_dir(&sub_dir).is_ok());
@@ -52,7 +52,7 @@ mod tests {
     fn test_remove_file() {
         let tmp_dir = tempdir().unwrap();
         let file_path = tmp_dir.path().join("testfile.txt");
-        File::create(&file_path).unwrap();
+        let _ = File::create(&file_path).unwrap();
 
         assert!(remove_file(&file_path).is_ok());
         assert!(!file_path.exists());
@@ -63,8 +63,8 @@ mod tests {
         let tmp_dir = tempdir().unwrap();
         let file1 = tmp_dir.path().join("file1.txt");
         let file2 = tmp_dir.path().join("file2.txt");
-        File::create(&file1).unwrap();
-        File::create(&file2).unwrap();
+        let _ = File::create(&file1).unwrap();
+        let _ = File::create(&file2).unwrap();
 
         clean_files(tmp_dir.path().join("*.txt").to_str().unwrap())
             .unwrap();
@@ -76,7 +76,7 @@ mod tests {
     fn test_clean_files_no_match() {
         let tmp_dir = tempdir().unwrap();
         let file1 = tmp_dir.path().join("file1.txt");
-        File::create(&file1).unwrap();
+        let _ = File::create(&file1).unwrap();
 
         clean_files(tmp_dir.path().join("*.log").to_str().unwrap())
             .unwrap();

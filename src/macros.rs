@@ -181,9 +181,9 @@ macro_rules! macro_cargo_cmd {
 /// in your code.
 #[macro_export]
 macro_rules! run_command {
-    ($cmd:expr, $context:expr) => {
-        $cmd.run().context($context)?
-    };
+    ($cmd:expr, $context:expr) => {{
+        let _ = $cmd.run().context($context)?;
+    }};
 }
 
 /// Executes a standard command and provides context for any potential errors.

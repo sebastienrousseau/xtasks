@@ -4,39 +4,29 @@
 //!
 //! ## Overview
 //!
-//! This module provides a comprehensive suite of tasks aimed at streamlining the development,
-//! testing, and maintenance of Rust projects. It leverages `cargo xtask`, a convention for
-//! creating and running custom cargo commands, enabling developers to extend Cargo's
-//! capabilities and integrate additional tooling and workflows directly into their build process.
+//! This module provides a comprehensive suite of tasks aimed at streamlining the development, testing, and maintenance of Rust projects. It leverages `cargo xtask`, a convention for creating and running custom cargo commands, enabling developers to extend Cargo's capabilities and integrate additional tooling and workflows directly into their build process.
 //!
 //! ## Features
 //!
-//! - **Documentation Generation**: Automate the creation of project documentation, ensuring
-//!   consistency and completeness across all codebase components.
+//! - **Documentation Generation**: Automate the creation of project documentation, ensuring consistency and completeness across all codebase components.
 //!
-//! - **Continuous Integration (CI) Tasks**: Implement a variety of CI tasks to validate code
-//!   quality, run tests, and ensure the stability of the codebase.
+//! - **Continuous Integration (CI) Tasks**: Implement a variety of CI tasks to validate code quality, run tests, and ensure the stability of the codebase.
 //!
-//! - **Dependency Analysis**: Analyze project dependencies for potential issues, outdated
-//!   libraries, and opportunities for optimization.
+//! - **Dependency Analysis**: Analyze project dependencies for potential issues, outdated libraries, and opportunities for optimization.
 //!
-//! - **Development Workflow Enhancement**: Streamline the development workflow with tasks
-//!   designed to automate repetitive tasks and improve efficiency.
+//! - **Development Workflow Enhancement**: Streamline the development workflow with tasks designed to automate repetitive tasks and improve efficiency.
 //!
-//! - **Customization**: Easily extend and customize tasks to suit the unique requirements of
-//!   your project.
+//! - **Customization**: Easily extend and customize tasks to suit the unique requirements of your project.
 //!
 //! ## Usage
 //!
-//! To use these tasks, you will need to have `cargo xtask` installed. Once installed, you can
-//! run tasks using the following command:
+//! To use these tasks, you will need to have `cargo xtask` installed. Once installed, you can run tasks using the following command:
 //!
 //! ```sh
 //! cargo xtask <task-name>
 //! ```
 //!
-//! Replace `<task-name>` with the name of the task you wish to execute. Each task may have its
-//! own set of arguments and options, which can be discovered by running:
+//! Replace `<task-name>` with the name of the task you wish to execute. Each task may have its own set of arguments and options, which can be discovered by running:
 //!
 //! ```sh
 //! cargo xtask <task-name> --help
@@ -44,17 +34,14 @@
 //!
 //! ## Contributing
 //!
-//! Contributions to enhance existing tasks or add new tasks are welcome. Please ensure that all
-//! new tasks are well-documented and include appropriate error handling to maintain the
-//! robustness of the tooling.
+//! Contributions to enhance existing tasks or add new tasks are welcome. Please ensure that all new tasks are well-documented and include appropriate error handling to maintain the robustness of the tooling.
 //!
 //! ## License
 //!
-//! This collection of cargo xtasks is distributed under the terms of both the MIT license and
-//! the Apache License (Version 2.0). See LICENSE-APACHE and LICENSE-MIT for details.
+//! This collection of cargo xtasks is distributed under the terms of both the MIT license and the Apache License (Version 2.0). See LICENSE-APACHE and LICENSE-MIT for details.
 
 use crate::tasks::{
-    bloat::{deps, time},
+    bloat::{deps, format_analysis_results, time},
     coverage::coverage,
     docs::docs,
     powerset::powerset,
@@ -63,7 +50,12 @@ use anyhow::{Context, Result as AnyResult};
 use clap::{Arg, ArgAction, ArgMatches, Command};
 use duct::cmd;
 use log::error;
-use std::{env, fs, path::Path};
+use std::{
+    env,
+    fs::write,
+    fs::{self, read_to_string},
+    path::Path,
+};
 
 /// Analyses the dependencies of the current project to find which ones contribute most to the build size.
 pub mod bloat;
@@ -115,7 +107,7 @@ fn is_installed(command: &str) -> bool {
 ///
 /// This function will return an error if any of the installation commands fail to run,
 /// or if any other error occurs during execution.
-pub fn install() -> AnyResult<()> {
+pub fn install() -> Result<(), anyhow::Error> {
     let commands = [
         ("cargo", ["install", "cargo-watch"].as_ref()),
         ("cargo", ["install", "cargo-hack"].as_ref()),
@@ -131,11 +123,17 @@ pub fn install() -> AnyResult<()> {
         if is_installed(args[1]) {
             println!("{} is already installed.", args[1]);
         } else {
-            cmd(*cmd_name, *args).run().context(format!(
+            let result = cmd(*cmd_name, *args).run().context(format!(
                 "Failed to run install command: {} {}",
                 cmd_name,
                 args.join(" ")
-            ))?;
+            ));
+
+            // Handle the result properly
+            if let Err(e) = result {
+                eprintln!("{}", e);
+                return Err(e);
+            }
         }
     }
 
@@ -149,14 +147,13 @@ pub fn install() -> AnyResult<()> {
 ///
 /// # Returns
 ///
-/// * `AnyResult<toml::Value>`: A `toml::Value` representing the parsed configuration,
-///   or an `Err` variant encapsulating any error that occurs during parsing.
+/// * `AnyResult<toml::Value>`: A `toml::Value` representing the parsed configuration, or an `Err` variant encapsulating any error that occurs during parsing.
 ///
 /// # Errors
 ///
 /// This function will return an error if the `xtasks.toml` file cannot be read or parsed.
 pub fn parse_config() -> AnyResult<Option<toml::Value>> {
-    match fs::read_to_string("xtasks.toml") {
+    match read_to_string("xtasks.toml") {
         Ok(config_content) => {
             let config: toml::Value =
                 toml::from_str(&config_content)
@@ -224,6 +221,18 @@ pub fn main_with_args(args: &[String]) -> AnyResult<()> {
         ),
 )
         .subcommand(
+    Command::new("bloat-report")
+        .arg(dry_run_arg.clone())
+        .arg(
+            Arg::new("output")
+                .short('o')
+                .long("output")
+                .value_name("OUTPUT")
+                .help("The output file to write formatted results to")
+                .required(true),
+        ),
+)
+        .subcommand(
     Command::new("bloat-time")
         .arg(dry_run_arg.clone())
         .arg(
@@ -276,6 +285,9 @@ pub fn main_with_args(args: &[String]) -> AnyResult<()> {
         Some(("bloat-deps", sub_matches)) => {
             handle_bloat_deps(sub_matches)
         }
+        Some(("bloat-report", sub_matches)) => {
+            handle_bloat_report(sub_matches)
+        }
         Some(("bloat-time", sub_matches)) => {
             handle_bloat_time(sub_matches)
         }
@@ -327,6 +339,83 @@ fn handle_install(matches: &ArgMatches) -> AnyResult<()> {
         println!("Would install tools");
     } else {
         install().context("Failed to install tools")?;
+    }
+    Ok(())
+}
+
+/// Handles the `bloat-report` subcommand.
+///
+/// This function generates a detailed bloat report by running the `cargo bloat` command, processing its output, and formatting it into a human-readable table. The report can be printed to the console or written to a specified output file.
+///
+/// # Arguments
+///
+/// * `args` - A reference to `clap::ArgMatches` containing the command-line arguments.
+///
+/// # Returns
+///
+/// * `AnyResult<()>` - An `Ok(())` variant if the report is generated successfully or
+///   a `Result::Err` variant encapsulating any error that occurs during execution.
+///
+/// # Errors
+///
+/// This function will return an error if:
+/// - The `cargo bloat` command fails to run.
+/// - The output of the `cargo bloat` command cannot be parsed.
+/// - The formatted report cannot be written to the specified output file.
+///
+pub fn handle_bloat_report(args: &ArgMatches) -> AnyResult<()> {
+    let dry_run =
+        args.get_one::<bool>("dry-run").copied().unwrap_or(false);
+    if dry_run {
+        println!("Would generate bloat report");
+    } else {
+        let output = args.get_one::<String>("output");
+
+        // Generate cargo bloat output
+        let cargo_bloat_output =
+            cmd!("cargo", "bloat", "--release", "--crates")
+                .read()
+                .context("Failed to run cargo bloat")?;
+
+        // Print raw output for debugging
+        // println!("cargo bloat output:\n{}", cargo_bloat_output);
+
+        let raw_output =
+            String::from_utf8(cargo_bloat_output.into_bytes())
+                .context("Failed to parse cargo bloat output")?;
+
+        // Preprocess the raw output to match the expected format
+        let preprocessed_output: String = raw_output
+            .lines()
+            .skip_while(|line| {
+                !line.starts_with(" File  .text     Size Crate")
+            })
+            .skip(1) // Skip the header line
+            .take_while(|line| !line.trim().starts_with("56.7%")) // Take lines until we reach the total line
+            .filter(|line| line.split_whitespace().count() >= 4) // Ensure there are enough parts in the line
+            .map(|line| {
+                let parts: Vec<&str> =
+                    line.split_whitespace().collect();
+                let crate_name = parts.last().unwrap();
+                let size = parts[2];
+                let percentage = parts[0];
+                format!("{}, {}, {}", crate_name, size, percentage)
+            })
+            .collect::<Vec<String>>()
+            .join("\n");
+
+        // Print preprocessed output for debugging
+        // println!("Preprocessed output:\n{}", preprocessed_output);
+
+        let formatted_report =
+            format_analysis_results(&preprocessed_output)?;
+
+        if let Some(output_file) = output {
+            write(output_file, formatted_report)
+                .context("Failed to write output file")?;
+        } else {
+            println!("Bloat Report:\n{}", formatted_report);
+        }
     }
     Ok(())
 }
@@ -775,42 +864,85 @@ fn handle_bloat_time(matches: &ArgMatches) -> AnyResult<()> {
     Ok(())
 }
 
-/// Runs the linter on the project's codebase.
-///
-/// This function executes the `cargo clippy` command to lint the project's code.
+/// Runs the linter using `cargo clippy` and checks for successful execution.
 ///
 /// # Returns
 ///
-/// * `AnyResult<()>`: An `Ok(())` variant if the linting process is successful,
-///   or an `Err` variant encapsulating any error that occurs during execution.
-///
-/// # Errors
-///
-/// This function will return an error if the linting process fails.
+/// * `AnyResult<()>` - An `Ok(())` variant if the linter runs successfully or
+///   a `Result::Err` variant encapsulating any error that occurs during execution.
 fn run_linter() -> AnyResult<()> {
-    cmd!("cargo", "clippy", "--all-targets", "--all-features")
-        .run()
-        .context("Failed to run linter")?;
-    Ok(())
+    let output =
+        cmd!("cargo", "clippy", "--all-targets", "--all-features")
+            .run()
+            .expect("Failed to run linter");
+    if output.status.success() {
+        Ok(())
+    } else {
+        Err(anyhow::anyhow!(
+            "Linter failed with exit code: {:?}",
+            output.status
+        ))
+    }
 }
 
-/// Formats the project's codebase according to the specified formatting rules.
-///
-/// This function executes the `cargo fmt` command to format the project's code.
+/// Runs the formatter using `cargo fmt` and checks for successful execution.
 ///
 /// # Returns
 ///
-/// * `AnyResult<()>`: An `Ok(())` variant if the formatting process is successful,
-///   or an `Err` variant encapsulating any error that occurs during execution.
-///
-/// # Errors
-///
-/// This function will return an error if the formatting process fails.
+/// * `AnyResult<()>` - An `Ok(())` variant if the formatter runs successfully or
+///   a `Result::Err` variant encapsulating any error that occurs during execution.
 fn run_formatter() -> AnyResult<()> {
-    cmd!("cargo", "fmt", "--all")
+    let output = cmd!("cargo", "fmt", "--all")
         .run()
-        .context("Failed to run formatter")?;
-    Ok(())
+        .expect("Failed to run formatter");
+    if output.status.success() {
+        Ok(())
+    } else {
+        Err(anyhow::anyhow!(
+            "Formatter failed with exit code: {:?}",
+            output.status
+        ))
+    }
+}
+
+/// Runs the checker using `cargo check` and checks for successful execution.
+///
+/// # Returns
+///
+/// * `AnyResult<()>` - An `Ok(())` variant if the checker runs successfully or
+///   a `Result::Err` variant encapsulating any error that occurs during execution.
+fn run_checker() -> AnyResult<()> {
+    let output = cmd!("cargo", "check", "--all", "--release")
+        .run()
+        .expect("Failed to run checker");
+    if output.status.success() {
+        Ok(())
+    } else {
+        Err(anyhow::anyhow!(
+            "Checker failed with exit code: {:?}",
+            output.status
+        ))
+    }
+}
+
+/// Runs the build using `cargo build` and checks for successful execution.
+///
+/// # Returns
+///
+/// * `AnyResult<()>` - An `Ok(())` variant if the build runs successfully or
+///   a `Result::Err` variant encapsulating any error that occurs during execution.
+fn run_build() -> AnyResult<()> {
+    let output = cmd!("cargo", "build", "--all", "--release")
+        .run()
+        .expect("Failed to build");
+    if output.status.success() {
+        Ok(())
+    } else {
+        Err(anyhow::anyhow!(
+            "Build failed with exit code: {:?}",
+            output.status
+        ))
+    }
 }
 
 /// Prepares the project for release by running necessary checks and builds.
@@ -827,13 +959,29 @@ fn run_formatter() -> AnyResult<()> {
 ///
 /// This function will return an error if the release preparation process fails.
 fn prepare_release() -> AnyResult<()> {
-    cmd!("cargo", "check", "--all", "--release")
-        .run()
-        .context("Failed to run release checks")?;
-    cmd!("cargo", "build", "--all", "--release")
-        .run()
-        .context("Failed to build release artifacts")?;
+    run_checker().context("Failed to run release checks")?;
+    run_build().context("Failed to build release artifacts")?;
     Ok(())
+}
+
+/// Runs the benchmarks using `cargo bench` and checks for successful execution.
+///
+/// # Returns
+///
+/// * `AnyResult<()>` - An `Ok(())` variant if the benchmarks run successfully or
+///   a `Result::Err` variant encapsulating any error that occurs during execution.
+fn execute_benchmarks() -> AnyResult<()> {
+    let output = cmd!("cargo", "bench", "--all")
+        .run()
+        .expect("Failed to run benchmarks");
+    if output.status.success() {
+        Ok(())
+    } else {
+        Err(anyhow::anyhow!(
+            "Benchmarks failed with exit code: {:?}",
+            output.status
+        ))
+    }
 }
 
 /// Runs the project's benchmarks.
@@ -849,10 +997,28 @@ fn prepare_release() -> AnyResult<()> {
 ///
 /// This function will return an error if the benchmarking process fails.
 fn run_benchmarks() -> AnyResult<()> {
-    cmd!("cargo", "bench", "--all")
-        .run()
-        .context("Failed to run benchmarks")?;
+    execute_benchmarks().context("Failed to run benchmarks")?;
     Ok(())
+}
+
+/// Runs the security audit using `cargo audit` and checks for successful execution.
+///
+/// # Returns
+///
+/// * `AnyResult<()>` - An `Ok(())` variant if the security audit runs successfully or
+///   a `Result::Err` variant encapsulating any error that occurs during execution.
+fn execute_security_audit() -> AnyResult<()> {
+    let output = cmd!("cargo", "audit")
+        .run()
+        .expect("Failed to run security audit");
+    if output.status.success() {
+        Ok(())
+    } else {
+        Err(anyhow::anyhow!(
+            "Security audit failed with exit code: {:?}",
+            output.status
+        ))
+    }
 }
 
 /// Runs security checks on the project's dependencies and codebase.
@@ -868,9 +1034,7 @@ fn run_benchmarks() -> AnyResult<()> {
 ///
 /// This function will return an error if the security checking process fails.
 fn run_security_checks() -> AnyResult<()> {
-    cmd!("cargo", "audit")
-        .run()
-        .context("Failed to run security audit")?;
+    execute_security_audit().context("Failed to run security audit")?;
     Ok(())
 }
 
@@ -898,6 +1062,26 @@ fn manage_config() -> AnyResult<()> {
     Ok(())
 }
 
+/// Runs the dependency update using `cargo update` and checks for successful execution.
+///
+/// # Returns
+///
+/// * `AnyResult<()>` - An `Ok(())` variant if the dependency update runs successfully or
+///   a `Result::Err` variant encapsulating any error that occurs during execution.
+fn execute_update_dependencies() -> AnyResult<()> {
+    let output = cmd!("cargo", "update")
+        .run()
+        .expect("Failed to update dependencies");
+    if output.status.success() {
+        Ok(())
+    } else {
+        Err(anyhow::anyhow!(
+            "Dependency update failed with exit code: {:?}",
+            output.status
+        ))
+    }
+}
+
 /// Updates the project's dependencies.
 ///
 /// This function executes the `cargo update` command to update the project's dependencies to their latest compatible versions.
@@ -911,10 +1095,29 @@ fn manage_config() -> AnyResult<()> {
 ///
 /// This function will return an error if the dependency update process fails.
 fn update_dependencies() -> AnyResult<()> {
-    cmd!("cargo", "update")
-        .run()
+    execute_update_dependencies()
         .context("Failed to update dependencies")?;
     Ok(())
+}
+
+/// Runs the clean operation using `cargo clean` and checks for successful execution.
+///
+/// # Returns
+///
+/// * `AnyResult<()>` - An `Ok(())` variant if the clean operation runs successfully or
+///   a `Result::Err` variant encapsulating any error that occurs during execution.
+fn execute_clean_project() -> AnyResult<()> {
+    let output = cmd!("cargo", "clean")
+        .run()
+        .expect("Failed to clean project");
+    if output.status.success() {
+        Ok(())
+    } else {
+        Err(anyhow::anyhow!(
+            "Clean operation failed with exit code: {:?}",
+            output.status
+        ))
+    }
 }
 
 /// Cleans the project's build artifacts and generated files.
@@ -930,10 +1133,32 @@ fn update_dependencies() -> AnyResult<()> {
 ///
 /// This function will return an error if the cleaning process fails.
 fn clean_project() -> AnyResult<()> {
-    cmd!("cargo", "clean")
-        .run()
-        .context("Failed to clean project")?;
+    execute_clean_project().context("Failed to clean project")?;
     Ok(())
+}
+
+/// Runs the project initialization using `cargo new` and checks for successful execution.
+///
+/// # Arguments
+///
+/// * `project_dir` - The directory name for the new project.
+///
+/// # Returns
+///
+/// * `AnyResult<()>` - An `Ok(())` variant if the project initialization runs successfully or
+///   a `Result::Err` variant encapsulating any error that occurs during execution.
+fn execute_initialize_project(project_dir: &str) -> AnyResult<()> {
+    let output = cmd!("cargo", "new", "--bin", project_dir)
+        .run()
+        .expect("Failed to initialize new project");
+    if output.status.success() {
+        Ok(())
+    } else {
+        Err(anyhow::anyhow!(
+            "Project initialization failed with exit code: {:?}",
+            output.status
+        ))
+    }
 }
 
 /// Initializes a new project.
@@ -960,8 +1185,7 @@ fn initialize_project() -> AnyResult<()> {
     }
 
     // Initialize a new project
-    cmd!("cargo", "new", "--bin", project_dir)
-        .run()
+    execute_initialize_project(project_dir)
         .context("Failed to initialize new project")?;
 
     Ok(())
