@@ -137,7 +137,7 @@ mod tests {
     fn test_coverage() {
         let cmd = MockCommand::new("cargo");
         let output = cmd
-            .args(&["tarpaulin", "--out", "Html"])
+            .args(["tarpaulin", "--out", "Html"])
             .stdout("Coverage report generated successfully.")
             .spawn()
             .unwrap();
