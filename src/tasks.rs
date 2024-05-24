@@ -111,6 +111,7 @@ pub fn install() -> Result<(), anyhow::Error> {
     let commands = [
         ("cargo", ["install", "cargo-watch"].as_ref()),
         ("cargo", ["install", "cargo-hack"].as_ref()),
+        ("cargo", ["install", "cargo-tarpaulin"].as_ref()),
         ("cargo", ["install", "cargo-bloat"].as_ref()),
         (
             "rustup",
@@ -739,12 +740,11 @@ fn handle_vars() {
 fn handle_coverage(matches: &ArgMatches) -> AnyResult<()> {
     let dry_run =
         matches.get_one::<bool>("dry-run").copied().unwrap_or(false);
-    let dev = matches.get_one::<bool>("dev").copied().unwrap_or(false);
     if dry_run {
         println!("Would generate coverage report");
         Ok(())
     } else {
-        coverage(dev)
+        coverage()
     }
 }
 

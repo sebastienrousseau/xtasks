@@ -1,6 +1,6 @@
-use crate::run_command;
-use anyhow::{Context, Result as AnyResult};
+use anyhow::Result as AnyResult;
 use duct::cmd;
+use log::info;
 
 /// Generates a code coverage report for the current project.
 ///
@@ -12,17 +12,12 @@ use duct::cmd;
 ///
 /// Returns an error if the `cargo tarpaulin` command fails to execute.
 ///
-pub fn coverage(dev: bool) -> AnyResult<()> {
-    let coverage_cmd = if dev {
-        cmd!("cargo", "tarpaulin", "--out", "Html", "--dev")
-    } else {
-        cmd!("cargo", "tarpaulin", "--out", "Html")
-    };
+pub fn coverage() -> AnyResult<()> {
+    info!("Starting coverage generation");
 
-    // Capture the result of the macro call
-    run_command!(
-        coverage_cmd,
-        "Failed to execute 'cargo tarpaulin' for code coverage"
-    );
+    let _ = cmd!("cargo", "tarpaulin", "--out", "Html").run()?;
+
+    info!("Coverage report generated successfully.");
+
     Ok(())
 }
