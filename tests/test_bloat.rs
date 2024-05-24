@@ -104,7 +104,7 @@ mod tests {
         let result = format_analysis_results(raw_output).unwrap();
         assert_eq!(
             result,
-            "Dependency Analysis Results:\ncrate1: Size = 10KB, Time = 1s\ncrate2: Size = 20KB, Time = 2s\n"
+            "Dependency Analysis Results:\ncrate2: Size = 20KB, Time = 2s\ncrate1: Size = 10KB, Time = 1s\n"
         );
     }
 
