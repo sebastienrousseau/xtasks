@@ -740,11 +740,14 @@ fn handle_vars() {
 fn handle_coverage(matches: &ArgMatches) -> AnyResult<()> {
     let dry_run =
         matches.get_one::<bool>("dry-run").copied().unwrap_or(false);
+    let dev_mode =
+        matches.get_one::<bool>("dev").copied().unwrap_or(false); // Extract the `dev` parameter from matches
+
     if dry_run {
         println!("Would generate coverage report");
         Ok(())
     } else {
-        coverage()
+        coverage(dev_mode)
     }
 }
 
