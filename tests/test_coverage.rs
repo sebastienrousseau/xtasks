@@ -15,11 +15,6 @@ mod tests {
             I: IntoIterator<Item = S>,
             S: AsRef<OsStr>,
             Self: Sized;
-        fn env<K, V>(self, key: K, value: V) -> Self
-        where
-            K: AsRef<OsStr>,
-            V: AsRef<OsStr>,
-            Self: Sized;
         fn spawn(&mut self) -> Result<Output>;
     }
 
@@ -28,7 +23,6 @@ mod tests {
         stdout: Vec<u8>,
         stderr: Vec<u8>,
         args: Vec<String>,
-        env: Vec<(String, String)>,
     }
 
     #[allow(dead_code)]
@@ -39,7 +33,6 @@ mod tests {
                 stdout: Vec::new(),
                 stderr: Vec::new(),
                 args: Vec::new(),
-                env: Vec::new(),
             }
         }
 
@@ -66,7 +59,6 @@ mod tests {
                 stdout: Vec::new(),
                 stderr: Vec::new(),
                 args: Vec::new(),
-                env: Vec::new(),
             }
         }
 
@@ -79,18 +71,6 @@ mod tests {
                 args.into_iter()
                     .map(|s| s.as_ref().to_string_lossy().to_string()),
             );
-            self
-        }
-
-        fn env<K, V>(mut self, key: K, value: V) -> Self
-        where
-            K: AsRef<OsStr>,
-            V: AsRef<OsStr>,
-        {
-            self.env.push((
-                key.as_ref().to_string_lossy().to_string(),
-                value.as_ref().to_string_lossy().to_string(),
-            ));
             self
         }
 
