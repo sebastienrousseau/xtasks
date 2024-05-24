@@ -1935,6 +1935,7 @@ dependencies = [
  "glob",
  "log",
  "mockito",
+ "rayon",
  "rlg 0.0.4",
  "serde",
  "serde_json",

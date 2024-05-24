@@ -1,7 +1,11 @@
 use anyhow::{Context, Result as AnyResult};
 use derive_builder::Builder;
 use duct::cmd;
+use log::{error, info};
+use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use std::sync::Mutex;
 
 /// Represents the configuration for a Continuous Integration (CI) run.
 ///
@@ -37,6 +41,28 @@ pub struct CI {
     pub clippy_max: bool,
 }
 
+impl CI {
+    /// Validates the CI configuration.
+    ///
+    /// This method ensures that the configuration settings are valid.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the configuration is invalid.
+    pub fn validate(&self) -> AnyResult<()> {
+        if self.nightly
+            && !cmd!("rustup", "toolchain", "list")
+                .read()?
+                .contains("nightly")
+        {
+            return Err(anyhow::anyhow!(
+                "Nightly toolchain is not installed"
+            ));
+        }
+        Ok(())
+    }
+}
+
 impl CIBuilder {
     /// Executes the configured CI tasks.
     ///
@@ -47,51 +73,90 @@ impl CIBuilder {
     ///
     /// Returns an error if any of the cargo commands fail to execute.
     pub fn run(&self) -> AnyResult<()> {
-        let CI {
-            nightly,
-            clippy_max,
-        } = self.build().context("Failed to build CI configuration")?;
+        let ci =
+            self.build().context("Failed to build CI configuration")?;
+        ci.validate()?;
 
-        if nightly {
-            let _ = cmd!(
-                "rustup", "run", "nightly", "cargo", "fmt", "--",
-                "--check"
-            )
-            .run()
-            .context(
-                "Failed to execute 'cargo fmt' with nightly compiler",
-            )?;
-        } else {
-            let _ = cmd!("cargo", "fmt", "--", "--check")
-                .run()
-                .context("Failed to execute 'cargo fmt'")?;
+        let tasks: Vec<(String, Vec<String>)> = vec![
+            (
+                "cargo fmt".to_string(),
+                if ci.nightly {
+                    vec![
+                        "rustup".to_string(),
+                        "run".to_string(),
+                        "nightly".to_string(),
+                        "cargo".to_string(),
+                        "fmt".to_string(),
+                        "--".to_string(),
+                        "--check".to_string(),
+                    ]
+                } else {
+                    vec![
+                        "cargo".to_string(),
+                        "fmt".to_string(),
+                        "--".to_string(),
+                        "--check".to_string(),
+                    ]
+                },
+            ),
+            (
+                "cargo clippy".to_string(),
+                if ci.clippy_max {
+                    vec![
+                        "cargo".to_string(),
+                        "clippy".to_string(),
+                        "--all-targets".to_string(),
+                        "--all-features".to_string(),
+                        "--".to_string(),
+                        "-D".to_string(),
+                        "warnings".to_string(),
+                        "-W".to_string(),
+                        "clippy::pedantic".to_string(),
+                        "-W".to_string(),
+                        "clippy::nursery".to_string(),
+                    ]
+                } else {
+                    vec![
+                        "cargo".to_string(),
+                        "clippy".to_string(),
+                        "--".to_string(),
+                        "-D".to_string(),
+                        "warnings".to_string(),
+                    ]
+                },
+            ),
+            (
+                "cargo test".to_string(),
+                vec!["cargo".to_string(), "test".to_string()],
+            ),
+            (
+                "cargo test --doc".to_string(),
+                vec![
+                    "cargo".to_string(),
+                    "test".to_string(),
+                    "--doc".to_string(),
+                ],
+            ),
+        ];
+
+        let results = Mutex::new(HashMap::new());
+
+        tasks.par_iter().for_each(|(name, args)| {
+            info!("Running {}", name);
+            let result = cmd(&args[0], &args[1..]).run();
+            if let Err(e) = &result {
+                error!("Failed to execute {}: {}", name, e);
+            }
+            let _ =
+                results.lock().unwrap().insert(name.clone(), result);
+        });
+
+        let results = results.into_inner().unwrap();
+        for (name, result) in results {
+            let _ = result
+                .context(format!("Failed to execute {}", name))?;
         }
 
-        if clippy_max {
-            let _ = cmd!(
-                "cargo",
-                "clippy",
-                "--all-targets",
-                "--all-features",
-                "--",
-                "-D",
-                "warnings",
-                "-W",
-                "clippy::pedantic",
-                "-W",
-                "clippy::nursery"
-            )
-            .run()
-            .context("Failed to execute 'cargo clippy'")?;
-        } else {
-            let _ = cmd!("cargo", "clippy", "--", "-D", "warnings")
-                .run()
-                .context("Failed to execute 'cargo clippy'")?;
-        }
-
-        let _ = cmd!("cargo", "test")
-            .run()
-            .context("Failed to execute 'cargo test'")?;
         Ok(())
     }
 }
