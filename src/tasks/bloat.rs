@@ -100,7 +100,7 @@ pub fn handle_dry_run(
 /// Returns an error in the following cases:
 /// - If the package name is empty, returns an error with the message "Package name cannot be empty".
 /// - If the package name contains invalid characters, returns an error with the message "Package name contains invalid characters".
-/// - If the package build fails and the error message indicates that the package was not found, returns an error with the message "Package '<package>' not found".
+/// - If the package build fails and the error message indicates that the package was not found, returns an error with the message "Package 'package' not found".
 /// - If the package build fails due to other reasons, returns an error with the original error message and additional context.
 /// - If the dependency analysis fails, returns the original error.
 pub fn deps(package: &str, matches: &ArgMatches) -> AnyResult<()> {
