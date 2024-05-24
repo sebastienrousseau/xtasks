@@ -235,7 +235,7 @@ mod tests {
     fn test_real_command() {
         init();
         let output = RealCommand::new("echo")
-            .args(&["Hello, world!"])
+            .args(["Hello, world!"])
             .spawn()
             .expect("Command should succeed");
 
