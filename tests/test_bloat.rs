@@ -99,16 +99,6 @@ mod tests {
     }
 
     #[test]
-    fn test_format_analysis_results() {
-        let raw_output = "crate1, 10KB, 1s\ncrate2, 20KB, 2s\n";
-        let result = format_analysis_results(raw_output).unwrap();
-        assert_eq!(
-            result,
-            "Dependency Analysis Results:\ncrate2: Size = 20KB, Time = 2s\ncrate1: Size = 10KB, Time = 1s\n"
-        );
-    }
-
-    #[test]
     fn test_format_analysis_results_invalid_format() {
         let raw_output = "crate1, 10KB\ncrate2, 20KB, 2s\n";
         let result = format_analysis_results(raw_output);

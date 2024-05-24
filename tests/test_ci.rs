@@ -60,6 +60,7 @@ impl CommandRunner for RealCommand {
 ///
 /// This struct is used for testing command execution, allowing for the
 /// configuration of the command's output and behaviour.
+#[allow(dead_code)]
 struct MockCommand {
     status: ExitStatus,
     stdout: Vec<u8>,
