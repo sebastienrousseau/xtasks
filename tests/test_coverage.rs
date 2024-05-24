@@ -3,7 +3,7 @@ mod tests {
     use std::ffi::OsStr;
     use std::io::Result;
     use std::os::unix::process::ExitStatusExt;
-    use std::process::{Command, ExitStatus, Output};
+    use std::process::{ExitStatus, Output};
 
     #[allow(dead_code)]
     trait CommandRunner {
@@ -21,36 +21,6 @@ mod tests {
             V: AsRef<OsStr>,
             Self: Sized;
         fn spawn(&mut self) -> Result<Output>;
-    }
-
-    struct RealCommand(Command);
-
-    impl CommandRunner for RealCommand {
-        fn new<S: AsRef<OsStr>>(program: S) -> Self {
-            Self(Command::new(program))
-        }
-
-        fn args<I, S>(mut self, args: I) -> Self
-        where
-            I: IntoIterator<Item = S>,
-            S: AsRef<OsStr>,
-        {
-            let _ = self.0.args(args);
-            self
-        }
-
-        fn env<K, V>(mut self, key: K, value: V) -> Self
-        where
-            K: AsRef<OsStr>,
-            V: AsRef<OsStr>,
-        {
-            let _ = self.0.env(key, value);
-            self
-        }
-
-        fn spawn(&mut self) -> Result<Output> {
-            self.0.output()
-        }
     }
 
     struct MockCommand {
