@@ -3,7 +3,7 @@ mod tests {
     use std::ffi::OsStr;
     use std::io::Result;
     use std::os::unix::process::ExitStatusExt;
-    use std::process::{ExitStatus, Output};
+    use std::process::ExitStatus;
 
     #[allow(dead_code)]
     trait CommandRunner {
@@ -15,7 +15,7 @@ mod tests {
             I: IntoIterator<Item = S>,
             S: AsRef<OsStr>,
             Self: Sized;
-        fn spawn(&mut self) -> Result<Output>;
+        fn run(&mut self) -> Result<()>;
     }
 
     struct MockCommand {
@@ -74,23 +74,40 @@ mod tests {
             self
         }
 
-        fn spawn(&mut self) -> Result<Output> {
-            Ok(Output {
-                status: self.status,
-                stdout: self.stdout.clone(),
-                stderr: self.stderr.clone(),
-            })
+        fn run(&mut self) -> Result<()> {
+            if self.status.success() {
+                println!("{}", String::from_utf8_lossy(&self.stdout));
+                Ok(())
+            } else {
+                Err(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    format!(
+                        "Command failed: {}",
+                        String::from_utf8_lossy(&self.stderr)
+                    ),
+                ))
+            }
         }
     }
 
     #[test]
-    fn test_coverage() {
-        let cmd = MockCommand::new("cargo");
-        let output = cmd
+    fn test_coverage_success() {
+        let mut cmd = MockCommand::new("cargo")
             .args(["tarpaulin", "--out", "Html"])
-            .stdout("Coverage report generated successfully.")
-            .spawn()
-            .unwrap();
-        assert!(output.status.success());
+            .stdout("Coverage report generated successfully.");
+
+        let result = cmd.run();
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_coverage_failure() {
+        let mut cmd = MockCommand::new("cargo")
+            .args(["tarpaulin", "--out", "Html"])
+            .status(ExitStatus::from_raw(1))
+            .stderr("Failed to generate coverage report.");
+
+        let result = cmd.run();
+        assert!(result.is_err());
     }
 }
