@@ -1,6 +1,3 @@
-// Copyright © 2023 xtasks. All rights reserved.
-// SPDX-License-Identifier: Apache-2.0 OR MIT
-
 //!
 //! # `XTasks`
 //!
@@ -97,10 +94,6 @@
     html_logo_url = "https://kura.pro/xtasks/images/logos/xtasks.webp",
     html_root_url = "https://docs.rs/xtasks"
 )]
-#![forbid(missing_debug_implementations)]
-#![forbid(missing_docs)]
-#![forbid(unreachable_pub)]
-#![forbid(unsafe_code)]
 #![crate_name = "xtasks"]
 #![crate_type = "lib"]
 

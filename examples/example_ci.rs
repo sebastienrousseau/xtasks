@@ -1,10 +1,10 @@
-// Copyright © 2023 xtasks. All rights reserved.
-// SPDX-License-Identifier: Apache-2.0 OR MIT
+//! This crate provides tasks for continuous integration (CI).
 
 use anyhow::Context;
 use xtasks::tasks::ci::CIBuilder;
 
-pub fn main() -> anyhow::Result<()> {
+#[allow(clippy::redundant_pub_crate)]
+pub(crate) fn main() -> anyhow::Result<()> {
     // Create a CI builder with custom settings
     let ci_builder = CIBuilder::default()
         .nightly(true) // Set to use the nightly compiler

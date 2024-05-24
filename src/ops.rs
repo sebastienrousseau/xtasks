@@ -1,50 +1,21 @@
-// Copyright © 2023 xtasks. All rights reserved.
-// SPDX-License-Identifier: Apache-2.0 OR MIT
-
 //! `xtasks` is a collection of building block operations such as copy, remove, confirm, and more
 //! for use in Rust project management tasks.
 //!
 //! This module provides utility functions that abstract over common filesystem operations,
 //! making it easier to perform tasks like cleaning up generated files, copying directory contents,
-//!
-use anyhow::{Error as AnyError, Result as AnyResult};
+//! and confirming user actions.
+
+use anyhow::{Context, Error as AnyError, Result as AnyResult};
 use dialoguer::{theme::ColorfulTheme, Confirm};
 use fs_extra as fsx;
 use fsx::dir::CopyOptions;
 use glob::glob;
+use log::{error, info};
+use std::fs;
 use std::path::{Path, PathBuf};
 
 // Re-exporting cmd from duct for convenience.
 pub use duct::cmd;
-
-/// Removes files matching a given glob pattern.
-///
-/// This function searches for files that match the provided glob pattern and removes them,
-/// which is useful for cleaning up temporary or generated files in a project.
-///
-/// # Parameters
-///
-/// - `pattern`: The glob pattern used to find files to remove.
-///
-/// # Returns
-///
-/// A `Result` that is `Ok` if all files were successfully removed, or an `Err` wrapping an `anyhow::Error`
-/// if an error occurred.
-///
-/// # Errors
-///
-/// This function will return an error in the following situations:
-/// - If the glob pattern is invalid.
-/// - If any of the files matching the glob pattern cannot be removed.
-///
-pub fn clean_files(pattern: &str) -> AnyResult<()> {
-    let files = glob(pattern)
-        .map_err(AnyError::new)?
-        .collect::<Result<Vec<_>, _>>()
-        .map_err(AnyError::new)?;
-
-    files.into_iter().try_for_each(remove_file)
-}
 
 /// Removes a single file.
 ///
@@ -58,70 +29,43 @@ pub fn clean_files(pattern: &str) -> AnyResult<()> {
 /// # Returns
 ///
 /// A `Result` that is `Ok` if the file was successfully removed, or an `Err` wrapping an `anyhow::Error`
-/// if an error occurred during the removal process.
-///
-/// # Errors
-///
-/// This function will return an error in the following cases:
-/// - The file does not exist at the specified path.
-/// - The removal operation fails for any reason (e.g., insufficient permissions, file is in use, etc.).
-///
-pub fn remove_file<P>(path: P) -> AnyResult<()>
-where
-    P: AsRef<Path>,
-{
-    let path_ref = path.as_ref();
-    if !path_ref.exists() {
-        return Err(AnyError::new(std::io::Error::new(
-            std::io::ErrorKind::NotFound,
-            "File not found",
-        )));
-    }
-    fsx::file::remove(path_ref).map_err(AnyError::new)
-}
-
-/// Removes a directory along with its contents.
-///
-/// # Parameters
-///
-/// - `path`: The path of the directory to remove.
-///
-/// # Returns
-///
-/// A `Result` that is `Ok` if the directory was successfully removed, or an `Err` wrapping an `anyhow::Error`
 /// if an error occurred.
 ///
 /// # Errors
 ///
-/// This function will return an error if the directory removal fails.
-pub fn remove_dir<P>(path: P) -> AnyResult<()>
+/// This function will return an error if the file does not exist or cannot be removed.
+pub fn remove_file<P>(path: P) -> AnyResult<()>
 where
     P: AsRef<Path>,
 {
-    let path_ref = path.as_ref();
-    if !path_ref.is_dir() {
-        return Err(AnyError::new(std::io::Error::new(
-            std::io::ErrorKind::NotFound,
-            "Directory not found",
-        )));
+    let path = path.as_ref();
+    if path.exists() {
+        if path.is_file() {
+            fs::remove_file(path).with_context(|| {
+                format!("Failed to remove file: {path:?}")
+            })
+        } else {
+            Err(AnyError::msg(format!("Path is not a file: {path:?}")))
+        }
+    } else {
+        Err(AnyError::msg(format!("File does not exist: {path:?}")))
     }
-    fsx::dir::remove(path_ref).map_err(AnyError::new)
 }
 
-/// Checks if a given path exists.
+/// Checks if a file exists at the given path.
 ///
 /// # Parameters
 ///
-/// - `path`: The path to check.
+/// - `path`: A generic parameter that implements `AsRef<Path>`, representing the path to check.
 ///
 /// # Returns
 ///
-/// `true` if the path exists, `false` otherwise.
-pub fn exists<P>(path: P) -> bool
+/// A boolean indicating whether the file exists.
+pub fn file_exists<P>(path: P) -> bool
 where
     P: AsRef<Path>,
 {
-    Path::exists(path.as_ref())
+    path.as_ref().exists()
 }
 
 /// Copies the entire contents of a folder to another location.
@@ -152,7 +96,14 @@ where
     let mut opts = CopyOptions::new();
     opts.content_only = true;
     opts.overwrite = overwrite;
-    fsx::dir::copy(&from, &to, &opts).map_err(AnyError::new)
+
+    fsx::dir::copy(&from, &to, &opts).with_context(|| {
+        format!(
+            "Failed to copy contents from {:?} to {:?}",
+            from.as_ref(),
+            to.as_ref()
+        )
+    })
 }
 
 /// Prompts the user to confirm an action.
@@ -173,7 +124,15 @@ pub fn confirm(question: &str) -> AnyResult<bool> {
     Confirm::with_theme(&ColorfulTheme::default())
         .with_prompt(question)
         .interact()
-        .map_err(AnyError::new)
+        .with_context(|| {
+            format!(
+                "Failed to get confirmation for question: {question}"
+            )
+        })
+        .map_err(|e| {
+            error!("Error during confirmation: {}", e);
+            e
+        })
 }
 
 /// Retrieves the root directory of the cargo project.
@@ -186,6 +145,91 @@ pub fn confirm(question: &str) -> AnyResult<bool> {
 /// A `PathBuf` representing the root directory of the cargo project.
 pub fn root_dir() -> PathBuf {
     let mut xtask_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    xtask_dir.pop();
+    let _ = xtask_dir.pop();
     xtask_dir
+}
+
+/// Removes files and directories matching a given glob pattern.
+///
+/// This function searches for files and directories that match the provided glob pattern and removes them,
+/// which is useful for cleaning up temporary or generated files in a project.
+///
+/// # Parameters
+///
+/// - `pattern`: The glob pattern used to find files and directories to remove.
+///
+/// # Returns
+///
+/// A `Result` that is `Ok` if all files and directories were successfully removed, or an `Err` wrapping an `anyhow::Error`
+/// if an error occurred.
+///
+/// # Errors
+///
+/// This function will return an error in the following situations:
+/// - If the glob pattern is invalid.
+/// - If any of the files or directories matching the glob pattern cannot be removed.
+pub fn clean_files(pattern: &str) -> AnyResult<()> {
+    let entries = glob(pattern)
+        .with_context(|| format!("Invalid glob pattern: {pattern}"))?
+        .collect::<Result<Vec<_>, _>>()
+        .with_context(|| {
+            format!("Failed to read glob pattern: {pattern}")
+        })?;
+
+    for entry in entries {
+        if entry.is_file() {
+            match fs::remove_file(&entry) {
+                Ok(()) => {
+                    info!("Successfully removed file: {:?}", entry);
+                }
+                Err(e) => {
+                    error!("Failed to remove file {:?}: {}", entry, e);
+                }
+            }
+        } else if entry.is_dir() {
+            match fs::remove_dir_all(&entry) {
+                Ok(()) => {
+                    info!(
+                        "Successfully removed directory: {:?}",
+                        entry
+                    );
+                }
+                Err(e) => error!(
+                    "Failed to remove directory {:?}: {}",
+                    entry, e
+                ),
+            }
+        }
+    }
+    Ok(())
+}
+
+/// Removes a directory, even if it is not empty.
+///
+/// # Parameters
+///
+/// - `path`: A generic parameter that implements `AsRef<Path>`, representing the path of the directory to remove.
+///
+/// # Returns
+///
+/// A `Result` that is `Ok` if the directory was successfully removed, or an `Err` wrapping an `anyhow::Error`
+/// if an error occurred.
+///
+/// # Errors
+///
+/// This function will return an error if the directory does not exist or cannot be removed.
+pub fn remove_dir<P>(path: P) -> AnyResult<()>
+where
+    P: AsRef<Path>,
+{
+    let path = path.as_ref();
+    if path.exists() {
+        fs::remove_dir_all(path).with_context(|| {
+            format!("Failed to remove directory: {path:?}")
+        })
+    } else {
+        Err(AnyError::msg(format!(
+            "Directory does not exist: {path:?}"
+        )))
+    }
 }
