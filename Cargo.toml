@@ -93,6 +93,7 @@ vrd = "0.0.7"
 # Dev dependencies are only used for building.
 assert_cmd = "2.0.14"
 criterion = "0.5.1"
+mockito = "1.4.0"
 tempfile = "3.10.1"
 
 # Linting config

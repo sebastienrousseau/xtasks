@@ -1,12 +1,82 @@
-use std::collections::HashMap;
-
-use anyhow::{anyhow, Context, Result as AnyResult};
+use anyhow::{anyhow, Result as AnyResult};
+use clap::ArgMatches;
 use dtt::DateTime;
 use duct::cmd;
 use rlg::{log_format::LogFormat, log_level::LogLevel, macro_log};
+use std::collections::HashMap;
 use vrd::random::Random;
 
-/// Analyses the dependencies of the current project to find which ones contribute the most to the build size.
+/// Logs an error message and returns a formatted error with context.
+///
+/// This function simplifies the error logging and formatting process. It ensures that errors
+/// are consistently logged with a unique identifier and timestamp, and provides additional context
+/// for better debugging.
+///
+/// # Arguments
+///
+/// * `log_level` - The log level for the error message (e.g., `LogLevel::ERROR`).
+/// * `context` - A short description of the context in which the error occurred.
+/// * `err_msg` - The error message to be logged and returned.
+/// * `additional_context` - Additional context to provide more details about the error.
+///
+/// # Returns
+///
+/// Returns an `anyhow::Error` with the formatted error message and additional context.
+pub fn log_and_return_error(
+    log_level: &LogLevel,
+    context: &str,
+    err_msg: String,
+    additional_context: String,
+) -> anyhow::Error {
+    let date = DateTime::new();
+    let log = macro_log!(
+        &Random::default().int(0, 1_000_000_000).to_string(),
+        &date.iso_8601,
+        log_level,
+        context,
+        &err_msg,
+        &LogFormat::CLF
+    );
+    drop(log);
+    anyhow!(err_msg).context(additional_context)
+}
+
+/// Handles dry-run scenarios.
+///
+/// This function checks if the `dry-run` flag is set in the provided `ArgMatches` and logs an appropriate
+/// informational message. If `dry-run` is enabled, it returns `Ok(())` to indicate a successful dry-run.
+///
+/// # Arguments
+///
+/// * `matches` - An `ArgMatches` struct containing the command-line arguments.
+/// * `context` - A short description of the context for logging.
+///
+/// # Returns
+///
+/// Returns `Ok(())` if `dry-run` is enabled, otherwise `None` to indicate normal execution.
+pub fn handle_dry_run(
+    matches: &ArgMatches,
+    context: &str,
+) -> Option<AnyResult<()>> {
+    let dry_run =
+        matches.get_one::<bool>("dry-run").copied().unwrap_or(false);
+    if dry_run {
+        let date = DateTime::new();
+        let log = macro_log!(
+            &Random::default().int(0, 1_000_000_000).to_string(),
+            &date.iso_8601,
+            &LogLevel::INFO,
+            context,
+            "Dry run enabled",
+            &LogFormat::CLF
+        );
+        drop(log);
+        return Some(Ok(()));
+    }
+    None
+}
+
+/// Analyzes the dependencies of the current project to find which ones contribute the most to the build size.
 ///
 /// This function takes a package name as input and performs a dependency analysis using `cargo bloat`.
 /// It first checks if the package name is valid and logs appropriate error messages if it's empty or contains invalid characters.
@@ -19,6 +89,7 @@ use vrd::random::Random;
 /// # Arguments
 ///
 /// * `package` - The name of the package to analyze.
+/// * `matches` - The command-line arguments for handling dry-run scenarios.
 ///
 /// # Returns
 ///
@@ -32,35 +103,29 @@ use vrd::random::Random;
 /// - If the package build fails and the error message indicates that the package was not found, returns an error with the message "Package '<package>' not found".
 /// - If the package build fails due to other reasons, returns an error with the original error message and additional context.
 /// - If the dependency analysis fails, returns the original error.
-pub fn deps(package: &str) -> AnyResult<()> {
-    let date = DateTime::new();
+pub fn deps(package: &str, matches: &ArgMatches) -> AnyResult<()> {
+    if let Some(result) = handle_dry_run(matches, "Dependency Analysis")
+    {
+        return result;
+    }
 
     // Check if the package name is valid
     if package.is_empty() {
-        let log = macro_log!(
-            &Random::default().int(0, 1_000_000_000).to_string(),
-            &date.iso_8601,
+        return Err(log_and_return_error(
             &LogLevel::ERROR,
             "Dependency Analysis",
-            "Package name cannot be empty",
-            &LogFormat::CLF
-        );
-        drop(log);
-        return Err(anyhow::anyhow!("Package name cannot be empty"));
+            "Package name cannot be empty".to_string(),
+            "Failed due to empty package name".to_string(),
+        ));
     }
 
     if !package.chars().all(|c| c.is_alphanumeric() || c == '-') {
-        let log = macro_log!(
-            &Random::default().int(0, 1_000_000_000).to_string(),
-            &date.iso_8601,
+        return Err(log_and_return_error(
             &LogLevel::ERROR,
             "Dependency Analysis",
-            "Package name contains invalid characters",
-            &LogFormat::CLF
-        );
-        drop(log);
-        return Err(anyhow::anyhow!(
-            "Package name contains invalid characters"
+            "Package name contains invalid characters".to_string(),
+            "Failed due to invalid characters in package name"
+                .to_string(),
         ));
     }
 
@@ -68,49 +133,38 @@ pub fn deps(package: &str) -> AnyResult<()> {
     let build_result = cmd!("cargo", "build", "-p", package).run();
     if let Err(err) = build_result {
         if err.to_string().contains("could not find") {
-            let log = macro_log!(
-                &Random::default().int(0, 1_000_000_000).to_string(),
-                &date.iso_8601,
+            return Err(log_and_return_error(
                 &LogLevel::ERROR,
                 "Dependency Analysis",
-                format!("Package '{}' not found", package).as_str(),
-                &LogFormat::CLF
-            );
-            drop(log);
-            return Err(anyhow::anyhow!(format!(
-                "Package '{}' not found",
-                package
-            )));
+                format!("Package '{}' not found", package),
+                format!(
+                    "Package '{}' was not found during build process",
+                    package
+                ),
+            ));
         } else {
-            let log = macro_log!(
-                &Random::default().int(0, 1_000_000_000).to_string(),
-                &date.iso_8601,
+            return Err(log_and_return_error(
                 &LogLevel::ERROR,
                 "Dependency Analysis",
-                "Package build failed",
-                &LogFormat::CLF
-            );
-            drop(log);
-            return Err(err).context("Package build failed");
+                "Package build failed".to_string(),
+                "The package build process failed due to an unknown error".to_string(),
+            ));
         }
     }
 
     // Perform dependency analysis
     let analysis_result =
         cmd!("cargo", "bloat", "-p", package, "--crates").run();
-    if let Err(err) = analysis_result {
-        let log = macro_log!(
-            &Random::default().int(0, 1_000_000_000).to_string(),
-            &date.iso_8601,
+    if let Err(_err) = analysis_result {
+        return Err(log_and_return_error(
             &LogLevel::ERROR,
             "Dependency Analysis",
-            "Dependency analysis failed",
-            &LogFormat::CLF
-        );
-        drop(log);
-        return Err(err).context("Dependency analysis failed");
+            "Dependency analysis failed".to_string(),
+            "The dependency analysis process failed".to_string(),
+        ));
     }
 
+    let date = DateTime::new();
     let log = macro_log!(
         &Random::default().int(0, 1_000_000_000).to_string(),
         &date.iso_8601,
@@ -123,7 +177,7 @@ pub fn deps(package: &str) -> AnyResult<()> {
     Ok(())
 }
 
-/// Analyses the build times of the current project's dependencies.
+/// Analyzes the build times of the current project's dependencies.
 ///
 /// This function takes a package name as input and performs a build time analysis using `cargo bloat`.
 /// It first logs an informational message indicating that the build time analysis is starting.
@@ -135,6 +189,7 @@ pub fn deps(package: &str) -> AnyResult<()> {
 /// # Arguments
 ///
 /// * `package` - The name of the package to analyze.
+/// * `matches` - The command-line arguments for handling dry-run scenarios.
 ///
 /// # Returns
 ///
@@ -144,7 +199,11 @@ pub fn deps(package: &str) -> AnyResult<()> {
 ///
 /// Returns an error if the `cargo bloat` command fails to execute. This could be due to various reasons,
 /// such as the package not being found or `cargo bloat` not being installed.
-pub fn time(package: &str) -> AnyResult<()> {
+pub fn time(package: &str, matches: &ArgMatches) -> AnyResult<()> {
+    if let Some(result) = handle_dry_run(matches, "Time Analysis") {
+        return result;
+    }
+
     let date = DateTime::new();
     let log = macro_log!(
         &Random::default().int(0, 1_000_000_000).to_string(),
@@ -159,19 +218,17 @@ pub fn time(package: &str) -> AnyResult<()> {
     cmd!("cargo", "bloat", "-p", package, "--time")
         .run()
         .map(|_| ())  // Convert Ok(Output) to Ok(())
-        .map_err(|err| {
-            // Log the error and then return it
-            let log = macro_log!(
-                &Random::default().int(0, 1_000_000_000).to_string(),
-                &date.iso_8601,
+        .map_err(|_err| {
+            log_and_return_error(
                 &LogLevel::ERROR,
                 "Time Analysis",
-                "Build time analysis failed",
-                &LogFormat::CLF);
-            drop(log);
-            err
-        })
-        .with_context(|| format!("Failed to execute 'cargo bloat' for build time analysis on package '{}'", package))?;
+                "Build time analysis failed".to_string(),
+                format!(
+                    "Failed to execute 'cargo bloat' for build time analysis on package '{}'",
+                    package
+                ),
+            )
+        })?;
 
     let log = macro_log!(
         &Random::default().int(0, 1_000_000_000).to_string(),

@@ -828,7 +828,7 @@ fn handle_bloat_deps(matches: &ArgMatches) -> AnyResult<()> {
         let package = matches
             .get_one::<String>("package")
             .context("Please provide a package with -p")?;
-        deps(package)?;
+        deps(package, matches)?;
     }
     Ok(())
 }
@@ -859,7 +859,7 @@ fn handle_bloat_time(matches: &ArgMatches) -> AnyResult<()> {
         let package = matches
             .get_one::<String>("package")
             .context("Please provide a package with -p")?;
-        time(package)?;
+        time(package, matches)?;
     }
     Ok(())
 }
