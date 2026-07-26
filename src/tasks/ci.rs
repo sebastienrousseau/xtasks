@@ -16,6 +16,7 @@ use serde::{Deserialize, Serialize};
     Eq,
     Hash,
     Clone,
+    Copy,
     Serialize,
     Deserialize,
 )]
@@ -52,7 +53,7 @@ impl CIBuilder {
         } = self.build().context("Failed to build CI configuration")?;
 
         if nightly {
-            cmd!(
+            let _ = cmd!(
                 "rustup", "run", "nightly", "cargo", "fmt", "--",
                 "--check"
             )
@@ -61,13 +62,13 @@ impl CIBuilder {
                 "Failed to execute 'cargo fmt' with nightly compiler",
             )?;
         } else {
-            cmd!("cargo", "fmt", "--", "--check")
+            let _ = cmd!("cargo", "fmt", "--", "--check")
                 .run()
                 .context("Failed to execute 'cargo fmt'")?;
         }
 
         if clippy_max {
-            cmd!(
+            let _ = cmd!(
                 "cargo",
                 "clippy",
                 "--all-targets",
@@ -83,12 +84,12 @@ impl CIBuilder {
             .run()
             .context("Failed to execute 'cargo clippy'")?;
         } else {
-            cmd!("cargo", "clippy", "--", "-D", "warnings")
+            let _ = cmd!("cargo", "clippy", "--", "-D", "warnings")
                 .run()
                 .context("Failed to execute 'cargo clippy'")?;
         }
 
-        cmd!("cargo", "test")
+        let _ = cmd!("cargo", "test")
             .run()
             .context("Failed to execute 'cargo test'")?;
         Ok(())
