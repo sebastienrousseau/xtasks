@@ -378,6 +378,9 @@ name = "deranged"
 version = "0.5.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7cd812cc2bc1d69d4764bd80df88b4317eaef9e773c75226407d9bc0876b211c"
+dependencies = [
+ "serde_core",
+]
 
 [[package]]
 name = "derive_builder"
@@ -438,6 +441,20 @@ dependencies = [
  "regex",
  "serde",
  "time",
+]
+
+[[package]]
+name = "dtt"
+version = "0.0.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d3ad961df245c82bc67098f5bd69640d3194a081df8f0f5df1f017db4a05292a"
+dependencies = [
+ "pastey",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.19",
+ "time",
+ "version_check",
 ]
 
 [[package]]
@@ -767,6 +784,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "pastey"
+version = "0.2.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2ee67f1008b1ba2321834326597b8e186293b049a023cdef258527550b9935b4"
+
+[[package]]
 name = "pin-project-lite"
 version = "0.2.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -975,7 +998,7 @@ version = "0.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c6ccf670238310d5c31a52fed1a3314620d037a64f1e5fbdc71b2c50909134dc"
 dependencies = [
- "dtt",
+ "dtt 0.0.5",
  "tokio",
  "vrd 0.0.4",
 ]
@@ -1205,6 +1228,7 @@ dependencies = [
  "powerfmt",
  "serde_core",
  "time-core",
+ "time-macros",
 ]
 
 [[package]]
@@ -1212,6 +1236,16 @@ name = "time-core"
 version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9e1c906769ad99c88eaa54e728060edef082f8e358ff32030cb7c7d315e81109"
+
+[[package]]
+name = "time-macros"
+version = "0.2.32"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7e689342a48d2ea927c87ea50cabf8594854bf940e9310208848d680d668ed85"
+dependencies = [
+ "num-conv",
+ "time-core",
+]
 
 [[package]]
 name = "tinytemplate"
@@ -1324,7 +1358,7 @@ version = "0.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a81b8b5b404f3d7afa1b8142a6bc980c20cd68556c634c3db517871aa0402521"
 dependencies = [
- "rand 0.8.5",
+ "rand 0.8.7",
 ]
 
 [[package]]
@@ -1676,7 +1710,7 @@ dependencies = [
  "criterion",
  "derive_builder",
  "dialoguer",
- "dtt",
+ "dtt 0.0.11",
  "duct",
  "euxis-commons",
  "fs_extra",
