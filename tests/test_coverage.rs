@@ -1,6 +1,12 @@
 // Copyright © 2023 xtasks. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+// `RealCommand` and the full `CommandRunner` surface are deliberate
+// scaffolding: they document the real implementation that `MockCommand`
+// stands in for, so the mock stays checked against a concrete shape.
+// Only the mock is constructed here, which trips dead_code.
+#![allow(dead_code)]
+
 #[cfg(test)]
 mod tests {
     use std::ffi::OsStr;

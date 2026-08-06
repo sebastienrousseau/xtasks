@@ -58,8 +58,9 @@ mod tests {
 
     #[test]
     fn test_remove_file_non_existent() {
-        assert!(remove_file(Path::new("non_existent_file.txt"))
-            .is_err());
+        assert!(
+            remove_file(Path::new("non_existent_file.txt")).is_err()
+        );
     }
 
     #[test]
@@ -70,8 +71,9 @@ mod tests {
 
     #[test]
     fn test_remove_dir_non_existent() {
-        assert!(remove_dir(Path::new("non_existent_directory"))
-            .is_err());
+        assert!(
+            remove_dir(Path::new("non_existent_directory")).is_err()
+        );
     }
 
     #[test]

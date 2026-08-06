@@ -20,9 +20,12 @@ use vrd::Random;
 /// is not found, or if `cargo bloat` is not installed.
 pub fn deps(package: &str) -> AnyResult<()> {
     let date = DateTime::new();
+    // dtt 0.0.11 replaced the `iso_8601` field with `format_rfc3339()`,
+    // which is fallible. Format once per call and reuse.
+    let timestamp = date.format_rfc3339().unwrap_or_default();
     let log = macro_log!(
         &Random::default().int(0, 1_000_000_000).to_string(),
-        &date.iso_8601,
+        &timestamp,
         &LogLevel::INFO,
         "Dependencies",
         "Starting dependency analysis",
@@ -37,7 +40,7 @@ pub fn deps(package: &str) -> AnyResult<()> {
             // Log the error and then return it
             let log = macro_log!(
                 &Random::default().int(0, 1_000_000_000).to_string(),
-                &date.iso_8601,
+                &timestamp,
                 &LogLevel::ERROR,
                 "Dependencies",
                 "Dependency analysis failed",
@@ -48,7 +51,7 @@ pub fn deps(package: &str) -> AnyResult<()> {
         .with_context(|| format!("Failed to execute 'cargo bloat' for dependency analysis on package '{package}'"))?;
     let log = macro_log!(
         &Random::default().int(0, 1_000_000_000).to_string(),
-        &date.iso_8601,
+        &timestamp,
         &LogLevel::ERROR,
         "Dependencies",
         "Dependency analysis completed",
@@ -70,9 +73,12 @@ pub fn deps(package: &str) -> AnyResult<()> {
 /// such as the package not being found, or `cargo bloat` not being installed.
 pub fn time(package: &str) -> AnyResult<()> {
     let date = DateTime::new();
+    // dtt 0.0.11 replaced the `iso_8601` field with `format_rfc3339()`,
+    // which is fallible. Format once per call and reuse.
+    let timestamp = date.format_rfc3339().unwrap_or_default();
     let log = macro_log!(
         &Random::default().int(0, 1_000_000_000).to_string(),
-        &date.iso_8601,
+        &timestamp,
         &LogLevel::ERROR,
         "Time Analysis",
         "Starting build time analysis",
@@ -87,7 +93,7 @@ pub fn time(package: &str) -> AnyResult<()> {
             // Log the error and then return it
             let log = macro_log!(
                 &Random::default().int(0, 1_000_000_000).to_string(),
-                &date.iso_8601,
+                &timestamp,
                 &LogLevel::ERROR,
                 "Time Analysis",
                 "Build time analysis failed",
@@ -98,7 +104,7 @@ pub fn time(package: &str) -> AnyResult<()> {
         .with_context(|| format!("Failed to execute 'cargo bloat' for build time analysis on package '{package}'"))?;
     let log = macro_log!(
         &Random::default().int(0, 1_000_000_000).to_string(),
-        &date.iso_8601,
+        &timestamp,
         &LogLevel::ERROR,
         "Time Analysis",
         "Build time analysis completed",
