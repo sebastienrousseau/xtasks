@@ -102,7 +102,8 @@ pub mod powerset;
 /// This function will return an error if the external command fails to run, or if any other
 /// error occurs during execution.
 pub fn dev_with_command(command: &str) -> AnyResult<()> {
-    let _ = cmd!(command, "watch", "-x", "check", "-x", "test").run()?;
+    let _ =
+        cmd!(command, "watch", "-x", "check", "-x", "test").run()?;
     Ok(())
 }
 
@@ -142,7 +143,8 @@ pub fn install() -> AnyResult<()> {
     let _ = cmd!("cargo", "install", "cargo-watch").run()?;
     let _ = cmd!("cargo", "install", "cargo-hack").run()?;
     let _ = cmd!("cargo", "install", "cargo-bloat").run()?;
-    let _ = cmd!("rustup", "component", "add", "llvm-tools-preview").run()?;
+    let _ = cmd!("rustup", "component", "add", "llvm-tools-preview")
+        .run()?;
     let _ = cmd!("cargo", "install", "grcov").run()?;
     Ok(())
 }

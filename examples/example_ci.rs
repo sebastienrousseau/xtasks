@@ -1,6 +1,12 @@
 // Copyright © 2023 xtasks. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+// This file is both a standalone example and a module of
+// `examples/example.rs`, which calls this `main`. The `pub` is therefore
+// required, but from an example binary root the lint cannot see the
+// cross-module use and reports it as unreachable.
+#![allow(unreachable_pub)]
+
 use anyhow::Context;
 use xtasks::tasks::ci::CIBuilder;
 
