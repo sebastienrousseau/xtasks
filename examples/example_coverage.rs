@@ -5,10 +5,13 @@
 // `examples/example.rs`, which calls this `main`. The `pub` is therefore
 // required, but from an example binary root the lint cannot see the
 // cross-module use and reports it as unreachable.
+
+//! Example: the `coverage` task, which produces a coverage report.
 #![allow(unreachable_pub)]
 
 use xtasks::tasks::coverage::coverage;
 
+/// Demonstrates the `coverage` task, which produces a coverage report.
 pub fn main() {
     // Generate a development-specific HTML code coverage report
     if let Err(e) = coverage(true) {

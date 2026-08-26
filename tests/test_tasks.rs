@@ -1,6 +1,8 @@
 // Copyright © 2023 xtasks. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+//! Integration tests for the `tasks` task.
+
 #[cfg(test)]
 mod tests {
     use xtasks::tasks::{dev_with_command, main_with_args};

@@ -5,11 +5,14 @@
 // `examples/example.rs`, which calls this `main`. The `pub` is therefore
 // required, but from an example binary root the lint cannot see the
 // cross-module use and reports it as unreachable.
+
+//! Example: the `docs` task, which builds the API documentation.
 #![allow(unreachable_pub)]
 
 use xtasks::tasks::docs::docs;
 use xtasks::tasks::docs::ensure_cargo_watch_installed;
 
+/// Demonstrates the `docs` task, which builds the API documentation.
 pub fn main() {
     // Ensure that the cargo-watch tool is installed
     if let Err(e) = ensure_cargo_watch_installed() {

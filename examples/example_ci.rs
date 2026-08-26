@@ -5,11 +5,14 @@
 // `examples/example.rs`, which calls this `main`. The `pub` is therefore
 // required, but from an example binary root the lint cannot see the
 // cross-module use and reports it as unreachable.
+
+//! Example: the `ci` task, which runs the full local check suite.
 #![allow(unreachable_pub)]
 
 use anyhow::Context;
 use xtasks::tasks::ci::CIBuilder;
 
+/// Demonstrates the `ci` task, which runs the full local check suite.
 pub fn main() -> anyhow::Result<()> {
     // Create a CI builder with custom settings
     let ci_builder = CIBuilder::default()

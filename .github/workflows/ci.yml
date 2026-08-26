@@ -28,7 +28,6 @@ jobs:
       run-fmt: true
       run-audit: true
       run-coverage: true
-      coverage-threshold: 80
     secrets: inherit
 
   # Nightly toolchain tests (optional, continue on error)

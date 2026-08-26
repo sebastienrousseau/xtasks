@@ -5,10 +5,13 @@
 // `examples/example.rs`, which calls this `main`. The `pub` is therefore
 // required, but from an example binary root the lint cannot see the
 // cross-module use and reports it as unreachable.
+
+//! Example: the `bloat` tasks — dependency size analysis and build timing.
 #![allow(unreachable_pub)]
 
 use xtasks::tasks::bloat::{deps, time};
 
+/// Demonstrates the `bloat` tasks: dependency size analysis and build timing.
 pub fn main() {
     // Example usage of the `deps` function to analyze the dependencies of a package
     let package_name = "dtt";

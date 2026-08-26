@@ -5,6 +5,8 @@
 // scaffolding: they document the real implementation that `MockCommand`
 // stands in for, so the mock stays checked against a concrete shape.
 // Only the mock is constructed here, which trips dead_code.
+
+//! Integration tests for the `ci` task.
 #![allow(dead_code)]
 
 use std::{
@@ -124,7 +126,7 @@ impl CommandRunner for RealCommand {
         I: IntoIterator<Item = S>,
         S: AsRef<OsStr>,
     {
-        self.0.args(args);
+        let _ = self.0.args(args);
         self
     }
 
@@ -143,7 +145,7 @@ impl CommandRunner for RealCommand {
         K: AsRef<OsStr>,
         V: AsRef<OsStr>,
     {
-        self.0.env(key, value);
+        let _ = self.0.env(key, value);
         self
     }
 

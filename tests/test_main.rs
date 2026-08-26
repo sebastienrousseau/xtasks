@@ -1,6 +1,8 @@
 // Copyright © 2023 xtasks. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+//! Integration tests for the binary entry point.
+
 use anyhow::{anyhow, Result};
 
 #[cfg(test)]
