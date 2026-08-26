@@ -571,19 +571,9 @@ dependencies = [
 
 [[package]]
 name = "euxis-commons"
-version = "0.0.2"
+version = "0.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5cc1cf9c4720703ea04d9eb4a191ac8e43b597805742e102fb7eaa4d9c3f5b27"
-dependencies = [
- "serde",
- "thiserror",
- "toml 0.8.23",
-]
-
-[[package]]
-name = "euxis-commons"
-version = "0.0.3"
-source = "git+https://github.com/sebastienrousseau/commons?tag=v0.0.3#dce2f877bd21bdcf9bbfad1893aa6bda43f7f746"
+checksum = "b4a42a5a820a2fa5cc80776ac24cfcd22d2a5d906f7daa4c33c5fcf56b73053a"
 dependencies = [
  "serde",
  "thiserror",
@@ -1131,14 +1121,14 @@ checksum = "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4"
 
 [[package]]
 name = "rlg"
-version = "0.0.11"
+version = "0.0.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "360278a4f0e37d507844875507586ee90fae486e35d4f94644d25a3b5af96a45"
+checksum = "ccd2dd34247a39c0a45e1cfcab4a3fc66c9b2917fafd3d82e607b680b3d1f0c5"
 dependencies = [
  "config",
  "crossbeam-queue",
  "envy",
- "euxis-commons 0.0.2",
+ "euxis-commons",
  "hostname",
  "itoa",
  "log",
@@ -1858,7 +1848,7 @@ dependencies = [
  "dialoguer",
  "dtt",
  "duct",
- "euxis-commons 0.0.3",
+ "euxis-commons",
  "fs_extra",
  "glob",
  "rlg",

@@ -5,10 +5,13 @@
 // `examples/example.rs`, which calls this `main`. The `pub` is therefore
 // required, but from an example binary root the lint cannot see the
 // cross-module use and reports it as unreachable.
+
+//! Example: the `powerset` task, which checks every feature combination.
 #![allow(unreachable_pub)]
 
 use xtasks::tasks::powerset::{powerset, PowersetBuilder};
 
+/// Demonstrates the `powerset` task, which checks every feature combination.
 pub fn main() {
     // Example of creating a PowersetBuilder with a specific depth
     let builder = PowersetBuilder::new(3);

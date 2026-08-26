@@ -1,6 +1,8 @@
 // Copyright © 2023 xtasks. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+//! Integration tests for the `ops` helpers.
+
 #[cfg(test)]
 mod tests {
 
@@ -12,8 +14,10 @@ mod tests {
     #[test]
     fn test_clean_files() {
         let tmp_dir = tempdir().unwrap();
-        fs::File::create(tmp_dir.path().join("tmp1.txt")).unwrap();
-        fs::File::create(tmp_dir.path().join("tmp2.txt")).unwrap();
+        let _ =
+            fs::File::create(tmp_dir.path().join("tmp1.txt")).unwrap();
+        let _ =
+            fs::File::create(tmp_dir.path().join("tmp2.txt")).unwrap();
 
         assert!(clean_files(
             tmp_dir.path().join("*.txt").to_str().unwrap()
@@ -27,7 +31,7 @@ mod tests {
     fn test_remove_file() {
         let tmp_dir = tempdir().unwrap();
         let tmp_file = tmp_dir.path().join("tmp.txt");
-        fs::File::create(&tmp_file).unwrap();
+        let _ = fs::File::create(&tmp_file).unwrap();
 
         assert!(remove_file(&tmp_file).is_ok());
         assert!(!exists(tmp_file));
@@ -46,8 +50,8 @@ mod tests {
         let tmp_dir = tempdir().unwrap();
         let sub_dir = tmp_dir.path().join("sub_dir");
         fs::create_dir(&sub_dir).unwrap();
-        fs::File::create(sub_dir.join("tmp1.txt")).unwrap();
-        fs::File::create(sub_dir.join("tmp2.txt")).unwrap();
+        let _ = fs::File::create(sub_dir.join("tmp1.txt")).unwrap();
+        let _ = fs::File::create(sub_dir.join("tmp2.txt")).unwrap();
 
         // Since clean_files expects a file glob pattern, providing a directory path should result in an error.
         assert!(clean_files(sub_dir.to_str().unwrap()).is_err());
@@ -80,7 +84,7 @@ mod tests {
     fn test_remove_dir_file() {
         let tmp_dir = tempdir().unwrap();
         let tmp_file = tmp_dir.path().join("tmp.txt");
-        fs::File::create(&tmp_file).unwrap();
+        let _ = fs::File::create(&tmp_file).unwrap();
         assert!(remove_dir(&tmp_file).is_err());
     }
 
@@ -89,7 +93,7 @@ mod tests {
         let tmp_dir = tempdir().unwrap();
         let sub_dir = tmp_dir.path().join("sub_dir");
         fs::create_dir(&sub_dir).unwrap();
-        fs::File::create(sub_dir.join("tmp1.txt")).unwrap();
+        let _ = fs::File::create(sub_dir.join("tmp1.txt")).unwrap();
         assert!(remove_dir(&sub_dir).is_ok());
         assert!(!exists(&sub_dir));
     }
@@ -99,8 +103,8 @@ mod tests {
         let tmp_dir = tempdir().unwrap();
         let sub_dir = tmp_dir.path().join("sub_dir");
         fs::create_dir(&sub_dir).unwrap();
-        fs::File::create(sub_dir.join("tmp1.txt")).unwrap();
-        fs::File::create(sub_dir.join("tmp2.txt")).unwrap();
+        let _ = fs::File::create(sub_dir.join("tmp1.txt")).unwrap();
+        let _ = fs::File::create(sub_dir.join("tmp2.txt")).unwrap();
 
         assert!(clean_files(
             tmp_dir.path().join("*").to_str().unwrap()
@@ -114,8 +118,10 @@ mod tests {
     #[test]
     fn test_clean_files_no_match() {
         let tmp_dir = tempdir().unwrap();
-        fs::File::create(tmp_dir.path().join("tmp1.txt")).unwrap();
-        fs::File::create(tmp_dir.path().join("tmp2.txt")).unwrap();
+        let _ =
+            fs::File::create(tmp_dir.path().join("tmp1.txt")).unwrap();
+        let _ =
+            fs::File::create(tmp_dir.path().join("tmp2.txt")).unwrap();
 
         assert!(clean_files(
             tmp_dir.path().join("*.md").to_str().unwrap()

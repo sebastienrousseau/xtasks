@@ -1,14 +1,36 @@
 // Copyright © 2023 xtasks. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+//! Integration tests for the `bloat` task.
+
 #[cfg(test)]
 mod tests {
     use xtasks::tasks::bloat::deps;
 
+    /// Reports whether `cargo bloat` is callable in this environment.
+    ///
+    /// `deps` shells out to it, so without it the test below is
+    /// measuring the machine rather than this crate.
+    fn cargo_bloat_available() -> bool {
+        std::process::Command::new("cargo")
+            .args(["bloat", "--version"])
+            .output()
+            .is_ok_and(|o| o.status.success())
+    }
+
     /// Tests the `deps` function with a valid package name.
-    /// This test expects the function to complete successfully.
+    ///
+    /// Skipped when `cargo bloat` is not installed. The subcommand is an
+    /// optional developer tool, and a missing tool is an environment
+    /// fact rather than a defect in `deps` -- asserting success
+    /// unconditionally made this test fail on any machine without it,
+    /// and on any machine whose cargo aliases shadow the subcommand.
     #[test]
     fn test_deps_with_real_command() {
+        if !cargo_bloat_available() {
+            eprintln!("skipping: `cargo bloat` is not available");
+            return;
+        }
         let package = "clap";
         let result = deps(package);
         assert!(result.is_ok(), "Expected Ok, got {result:?}");
