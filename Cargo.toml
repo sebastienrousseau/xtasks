@@ -63,11 +63,15 @@ dtt = "0.0.11"
 duct = "1.1.1"
 fs_extra = "1.3.0"
 glob = "0.3.1"
-rlg = "0.0.11"
+rlg = "0.0.12"
 serde = { version = "1.0.197", features = ["derive"] }
 serde_json = "1.0.108"
 vrd = "0.0.12"
-commons = { package = "euxis-commons", git = "https://github.com/sebastienrousseau/commons", tag = "v0.0.3", default-features = false, features = ["error", "config"] }
+# Published on crates.io since 0.0.3. The previous git+tag pin
+# resolved to the commit the v0.0.3 tag pointed at when the lockfile
+# was written, and kept resolving there after the tag was retargeted
+# -- so it silently tracked superseded code.
+commons = { package = "euxis-commons", version = "0.0.4", default-features = false, features = ["error", "config"] }
 
 [dev-dependencies]
 assert_cmd = "2.0.14"
