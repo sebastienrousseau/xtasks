@@ -209,6 +209,16 @@ fn main() {
 
 For transparency into our release cycle and in striving to maintain backward compatibility, XTasks follows [semantic versioning][7].
 
+## Documentation
+
+- [`doc/USER-GUIDE.md`](doc/USER-GUIDE.md) — every task and helper, with compiled examples
+- [`doc/ARCHITECTURE.md`](doc/ARCHITECTURE.md) — layout, dispatch, and why tasks shell out
+- [`doc/TESTING.md`](doc/TESTING.md) — testing a crate that runs other programs
+- [`doc/adr/`](doc/adr) — architecture decision records
+
+Project: [CONTRIBUTING](CONTRIBUTING.md) · [SECURITY](SECURITY.md) ·
+[SUPPORT](SUPPORT.md) · [CODE_OF_CONDUCT](CODE_OF_CONDUCT.md)
+
 ## License
 
 The project is licensed under the terms of both the MIT license and the Apache License (Version 2.0).
