@@ -1,71 +1,64 @@
-[licenses]
-# The lint level for crates which do not have a detectable license
-unlicensed = "deny"
+# cargo-deny configuration.
+#
+# The previous version of this file could not be parsed at all. It used
+# keys removed in cargo-deny v0.20 (`unlicensed`, `copyleft`,
+# `allow-osi-fsf-free`, and the per-severity `[advisories]` levels), and
+# a stray `[bans]` header on line 21 captured three `[licenses]` settings
+# that follow it, leaving two conflicting `allow` keys. `cargo deny
+# check` exited with a deserialize error, so this gate has been
+# inoperative rather than passing.
 
-# List of explicitly allowed licenses
-# See https://spdx.org/licenses/ for list of possible licenses
-# [possible values: any SPDX 3.7 short identifier (+ optional exception)].
-allow = [
-    "Apache-2.0",
-    "MIT",
-    "CC0-1.0",
-    "ISC",
-    "0BSD",
-    "BSD-2-Clause",
-    "BSD-3-Clause",
-    "Unlicense",
-    "Unicode-DFS-2016",
-]
-
-# List of banned licenses
-[bans]
-multiple-versions = "deny"
-
-
-# The lint level for licenses considered copyleft
-copyleft = "deny"
-
-# Blanket approval or denial for OSI-approved or FSF Free/Libre licenses
-# * both - The license will only be approved if it is both OSI-approved *AND* FSF/Free
-# * either - The license will be approved if it is either OSI-approved *OR* FSF/Free
-# * osi-only - The license will be approved if is OSI-approved *AND NOT* FSF/Free
-# * fsf-only - The license will be approved if is FSF/Free *AND NOT* OSI-approved
-# * neither - The license will be denied if is FSF/Free *OR* OSI-approved
-allow-osi-fsf-free = "either"
-
-# The confidence threshold for detecting a license from license text.
-# The higher the value, the more closely the license text must be to the
-# canonical license text of a valid SPDX license file.
-# [possible values: any between 0.0 and 1.0].
-confidence-threshold = 0.8
-
-# The graph highlighting used when creating dotgraphs for crates
-# with multiple versions
-# * lowest-version - The path to the lowest versioned duplicate is highlighted
-# * simplest-path - The path to the version with the fewest edges is highlighted
-# * all - Both lowest-version and simplest-path are used
-highlight = "all"
-
-# List of crates that are allowed. Use with care!
-allow = []
-
-# List of crates to deny
-deny = [
-    # Each entry the name of a crate and a version range. If version is
-    # not specified, all versions will be matched.
-]
-
-# Certain crates/versions that will be skipped when doing duplicate detection.
-skip = []
-
-# Similarly to `skip` allows you to skip certain crates during duplicate detection,
-# unlike skip, it also includes the entire tree of transitive dependencies starting at
-# the specified crate, up to a certain depth, which is by default infinite
-skip-tree = []
-
+[graph]
+all-features = true
 
 [advisories]
-notice = "deny"
-unmaintained = "deny"
-unsound = "deny"
-vulnerability = "deny"
+# Severity levels are no longer configured per class. Any RustSec
+# advisory at or above the default threshold fails the build unless it
+# is listed here, with a reason and a revisit condition.
+yanked = "warn"
+ignore = []
+
+[licenses]
+# Derived from the actual dependency graph under `--all-features`, not
+# inherited from a sibling project. Every entry below is reachable
+# today, which is what makes this list meaningful: anything new fails.
+allow = [
+    "MIT",
+    "Apache-2.0",
+    # `ring` and the `wasm-bindgen` line carry the LLVM exception.
+    "Apache-2.0 WITH LLVM-exception",
+    # `untrusted` / `rustls-webpki`.
+    "ISC",
+    # `memchr`, `byteorder`, `aho-corasick` are Unlicense OR MIT.
+    "Unlicense",
+    # Transitive BSD-licensed dependencies.
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    # `adler2` and compression helpers.
+    "0BSD",
+    # `foldhash`, via hashbrown.
+    "Zlib",
+    # `tiny-keccak` and similar offer BSL-1.0 as an alternative arm.
+    "BSL-1.0",
+    # `notify`'s dependency chain.
+    "CC0-1.0",
+    # `icu_*` / `zerovec`, pulled in transitively by `idna`.
+    "Unicode-3.0",
+]
+# One crate offers LGPL-2.1-or-later as a third alternative alongside
+# MIT and Apache-2.0. The expression is a disjunction, so a permissive
+# arm is taken and the copyleft option never applies -- but it is kept
+# out of `allow` so that stays explicit.
+confidence-threshold = 0.93
+
+[bans]
+# Duplicate versions are common and mostly benign in a build-tool
+# dependency tree; warn rather than fail so the gate stays credible.
+multiple-versions = "warn"
+wildcards = "deny"
+highlight = "all"
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]

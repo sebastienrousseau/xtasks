@@ -1,0 +1,35 @@
+# Codecov configuration.
+#
+# Without this file codecov applies its default project status: an
+# "auto" target with a zero threshold, so any drop at all fails. That
+# fired on a dependency-only change where the covered lines did not move
+# — 69/192 became 69/193, because a bumped dependency changed what
+# tarpaulin instruments. A 0.19% wobble with identical covered lines is
+# not a regression.
+#
+# `threshold: 1%` absorbs that instrumentation noise while still failing
+# on a real drop. The target is `auto`, i.e. "do not go backwards from
+# the base commit", rather than a fixed number.
+#
+# NOTE: coverage here is ~36%, well below the rest of the estate
+# (staticweaver targets 97%, html-generator 95%). `auto` is a ratchet,
+# not an endorsement — raise this to a fixed target as coverage improves.
+
+coverage:
+  precision: 2
+  round: down
+  range: "35...100"
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 1%
+    patch:
+      default:
+        target: 80%
+        threshold: 1%
+
+ignore:
+  - "tests/**"
+  - "benches/**"
+  - "examples/**"
