@@ -65,12 +65,6 @@ glob = "0.3.4"
 rlg = "0.0.12"
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
-vrd = "0.0.12"
-# Published on crates.io since 0.0.3. The previous git+tag pin
-# resolved to the commit the v0.0.3 tag pointed at when the lockfile
-# was written, and kept resolving there after the tag was retargeted
-# -- so it silently tracked superseded code.
-commons = { package = "euxis-commons", version = "0.0.4", default-features = false, features = ["error", "config"] }
 
 [dev-dependencies]
 assert_cmd = "2.2.2"
