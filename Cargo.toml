@@ -22,7 +22,7 @@ name = "xtasks"
 readme = "README.md"
 repository = "https://github.com/sebastienrousseau/xtasks"
 rust-version = "1.89.0"
-version = "0.0.2"
+version = "0.0.4"
 include = [
     "/CONTRIBUTING.md",
     "/LICENSE-APACHE",
