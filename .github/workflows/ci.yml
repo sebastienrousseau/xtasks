@@ -46,3 +46,16 @@ jobs:
 
       - name: Run tests
         run: cargo test --all-features
+
+  # Every version-bearing file must name Cargo.toml's version, so a tag
+  # can never again ship with the previous one (see the script).
+  release-preflight:
+    name: Release preflight
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - run: ./scripts/release-preflight.sh
