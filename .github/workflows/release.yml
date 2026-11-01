@@ -33,6 +33,9 @@ jobs:
     steps:
       - name: Checkout sources
         uses: actions/checkout@v7
+      - name: Release preflight
+        # The tag must match Cargo.toml and every version-bearing file.
+        run: ./scripts/release-preflight.sh "${GITHUB_REF_NAME}"
 
       - name: Resolve version and publication state
         id: resolve

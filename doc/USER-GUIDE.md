@@ -25,7 +25,7 @@ Or as a dependency, if you are building your own runner on top:
 
 ```toml
 [dependencies]
-xtasks = "0.0.2"
+xtasks = "0.0.4"
 ```
 
 ## 2. Tasks

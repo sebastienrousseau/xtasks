@@ -5,7 +5,7 @@
 
 #[cfg(test)]
 mod tests {
-    use xtasks::tasks::bloat::deps;
+    use xtasks::tasks::bloat::{deps, time};
 
     /// Reports whether `cargo bloat` is callable in this environment.
     ///
@@ -70,6 +70,58 @@ mod tests {
     fn test_deps_with_spaces() {
         let package = "package with spaces";
         let result = deps(package);
+        assert!(result.is_err(), "Expected Err, got {result:?}");
+    }
+
+    /// Tests that a failing `deps` run keeps the underlying error.
+    ///
+    /// The failure branch logs through `inspect_err`, which must hand
+    /// the command's error on unchanged: the result carries the
+    /// context naming the package and, beneath it, the I/O error the
+    /// command returned.
+    #[test]
+    fn test_deps_error_keeps_context_and_cause() {
+        let package = "this_package_should_not_exist";
+        let err =
+            deps(package).expect_err("a missing package must fail");
+        let message = err.to_string();
+        assert!(
+            message.contains("dependency analysis")
+                && message.contains(package),
+            "unexpected context: {message}"
+        );
+        assert!(
+            err.root_cause().downcast_ref::<std::io::Error>().is_some(),
+            "the command's error was replaced: {err:?}"
+        );
+    }
+
+    /// Tests the `time` function with a nonexistent package name.
+    ///
+    /// Whether `cargo bloat` is missing or the package is unknown, the
+    /// command fails, and `time` must return that failure with its
+    /// context and cause rather than swallow it.
+    #[test]
+    fn test_time_with_nonexistent_package() {
+        let package = "this_package_should_not_exist";
+        let err =
+            time(package).expect_err("a missing package must fail");
+        let message = err.to_string();
+        assert!(
+            message.contains("build time analysis")
+                && message.contains(package),
+            "unexpected context: {message}"
+        );
+        assert!(
+            err.root_cause().downcast_ref::<std::io::Error>().is_some(),
+            "the command's error was replaced: {err:?}"
+        );
+    }
+
+    /// Tests the `time` function with an empty package name.
+    #[test]
+    fn test_time_with_empty_package_name() {
+        let result = time("");
         assert!(result.is_err(), "Expected Err, got {result:?}");
     }
 }
