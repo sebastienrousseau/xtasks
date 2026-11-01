@@ -3,7 +3,7 @@
 Notable changes to `xtasks`. Earlier releases are described on
 the [GitHub releases page](https://github.com/sebastienrousseau/xtasks/releases).
 
-## [0.0.4] - Unreleased
+## [0.0.4] - 2026-11-01
 
 ### Changed
 
