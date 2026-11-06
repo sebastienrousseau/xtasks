@@ -21,6 +21,10 @@ concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
 
+# Read-only by default; jobs that write ask for it themselves.
+permissions:
+  contents: read
+
 jobs:
   # Resolve the version once and decide whether crates.io already has it,
   # so re-running an existing tag is a no-op rather than a hard failure.
@@ -283,6 +287,9 @@ jobs:
     if: github.event_name == 'push' || inputs.publish
     needs: [guard, build]
     runs-on: ubuntu-latest
+    permissions:
+      # gh release create uploads the draft release and its assets.
+      contents: write
     steps:
       # Check out the repository code
       - name: Checkout sources
@@ -325,7 +332,7 @@ jobs:
           VERSION: ${{ needs.guard.outputs.version }}
         run: |
           gh release create "v${VERSION}" \
-            --title "Xtasks 🦀 v${VERSION}" \
+            --title "xtasks ${VERSION}" \
             --generate-notes \
             --draft \
             dist/*.tar.gz dist/SHA256SUMS
