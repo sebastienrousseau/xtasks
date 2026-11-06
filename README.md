@@ -13,6 +13,22 @@
 
 # XTasks
 
+> [!WARNING]
+> **Deprecated and unmaintained.** `xtasks` 0.0.5 is the final release.
+> The crate will receive no further fixes, including security fixes,
+> and the repository is archived.
+>
+> Use instead:
+>
+> - a `Makefile` (or `justfile`) in your own repository for the
+>   commands you run, or
+> - a local [`cargo xtask`](https://github.com/matklad/cargo-xtask)
+>   crate in your workspace, which depends only on what your project
+>   needs.
+>
+> Existing versions stay on crates.io and keep building, but nothing
+> new should depend on this crate.
+
 Essential tools and tasks for Rust projects using the xtask pattern, simplifying
 common build and development workflows.
 
@@ -126,7 +142,7 @@ To use `XTasks`, add it as a dependency to your `Cargo.toml` file:
 
 ```shell
 [dependencies]
-xtasks = "0.0.4"
+xtasks = "0.0.5"
 ```
 
 Then, in your `lib.rs` or `main.rs` file, add:

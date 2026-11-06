@@ -22,7 +22,7 @@ name = "xtasks"
 readme = "README.md"
 repository = "https://github.com/sebastienrousseau/xtasks"
 rust-version = "1.89.0"
-version = "0.0.4"
+version = "0.0.5"
 include = [
     "/CONTRIBUTING.md",
     "/LICENSE-APACHE",
@@ -52,6 +52,11 @@ default = []
 
 [package.metadata.docs.rs]
 all-features = true
+
+# crates.io no longer renders badges, but lib.rs and other tools still
+# read this field.
+[badges]
+maintenance = { status = "deprecated" }
 
 [dependencies]
 anyhow = "1.0.104"
