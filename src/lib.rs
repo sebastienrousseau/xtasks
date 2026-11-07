@@ -13,7 +13,7 @@
 //! [![License](https://img.shields.io/crates/l/xtasks.svg?style=for-the-badge&color=007EC6&labelColor=03589B)](https://opensource.org/license/apache-2-0/ "MIT or Apache License, Version 2.0")
 //! [![Rust](https://img.shields.io/badge/rust-f04041?style=for-the-badge&labelColor=c0282d&logo=rust)](https://www.rust-lang.org "Rust")
 //!
-//! **Deprecated and unmaintained.** 0.0.5 is the final release and the
+//! **Deprecated and unmaintained.** 0.0.6 is the final release and the
 //! repository is archived. Use a `Makefile` or a local `cargo xtask`
 //! crate in your own workspace instead.
 //!
