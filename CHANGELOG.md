@@ -3,6 +3,32 @@
 Notable changes to `xtasks`. Earlier releases are described on
 the [GitHub releases page](https://github.com/sebastienrousseau/xtasks/releases).
 
+## [0.0.5] - 2026-11-06
+
+### Deprecated
+
+- **`xtasks` is deprecated and unmaintained.** This is the final
+  release; the GitHub repository is archived after it. Nothing on
+  crates.io depends on the crate. Use a `Makefile` or `justfile` in
+  your own repository, or a local `cargo xtask` crate in your
+  workspace. `Cargo.toml` declares
+  `[badges] maintenance = { status = "deprecated" }` and the README
+  and crate documentation open with the notice.
+
+### Changed
+
+- `rlg` 0.0.16 (from #80).
+- CI and release workflows default `GITHUB_TOKEN` to `contents: read`;
+  only the release job asks for `contents: write`. This clears the six
+  open `actions/missing-workflow-permissions` code-scanning alerts.
+- The release workflow titles the draft release `xtasks <version>`.
+
+### Removed
+
+- `document.yml`, a documentation workflow that could never run (its
+  job required a push to `main`, which it did not trigger on) and
+  targeted a GitHub Pages site the repository does not have.
+
 ## [0.0.4] - 2026-11-01
 
 ### Changed
