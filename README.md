@@ -14,7 +14,7 @@
 # XTasks
 
 > [!WARNING]
-> **Deprecated and unmaintained.** `xtasks` 0.0.5 is the final release.
+> **Deprecated and unmaintained.** `xtasks` 0.0.6 is the final release.
 > The crate will receive no further fixes, including security fixes,
 > and the repository is archived.
 >
@@ -142,7 +142,7 @@ To use `XTasks`, add it as a dependency to your `Cargo.toml` file:
 
 ```shell
 [dependencies]
-xtasks = "0.0.5"
+xtasks = "0.0.6"
 ```
 
 Then, in your `lib.rs` or `main.rs` file, add:

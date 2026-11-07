@@ -156,7 +156,9 @@ jobs:
             os: ubuntu-latest
             cross: true
           - target: i686-pc-windows-gnu
-            os: ubuntu-latest
+            # cross 0.2.5's windows-gnu image fails on ubuntu-latest
+            # (Ubuntu 26.04) at `rustup component list`; 24.04 builds it.
+            os: ubuntu-24.04
             cross: true
           - target: i686-pc-windows-msvc
             os: windows-latest
@@ -168,7 +170,9 @@ jobs:
             os: macos-latest
             cross: true
           - target: x86_64-pc-windows-gnu
-            os: ubuntu-latest
+            # cross 0.2.5's windows-gnu image fails on ubuntu-latest
+            # (Ubuntu 26.04) at `rustup component list`; 24.04 builds it.
+            os: ubuntu-24.04
             cross: true
           - target: x86_64-pc-windows-msvc
             os: windows-latest
